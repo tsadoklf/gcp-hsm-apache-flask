@@ -60,7 +60,6 @@ function test_kms(){
 
     openssl dgst -sha256 -verify "$PUBLIC_KEY_FILE" -signature "$SIGNATURE_FILE" -out verified_data.txt "$INPUT_FILE_NAME"
 
-
     echo ""
     echo "Creating a signature using openssl ..."
     echo ""
@@ -89,7 +88,7 @@ function create_self_signed_certificate(){
     openssl req -new -x509 -days 3650 -subj "$SUBJECT" -sha256 -engine pkcs11 -keyform engine -key "pkcs11:object=$KEY" -config openssal_server_cert.cnf > "$SELF_SIGNED_CERTIFICATE" 
 }
 
-function copy_self_signed_certificate(){}
+function copy_self_signed_certificate(){
     echo ""
     echo "Copying self-signed certificate to ..."
     echo ""
@@ -139,6 +138,7 @@ function enable_apache_modules_and_config(){
     echo "sudo a2ensite /etc/apache2/sites-available/$APACHE_CONFIG"
     sudo a2ensite "$APACHE_CONFIG"
 }
+
 function restart_apache(){
     echo "Restarting Apache ..."
     sudo systemctl restart apache2
@@ -146,7 +146,7 @@ function restart_apache(){
     echo "Apache configuration has been updated."
 }
 
-function verify_apache(){}
+function verify_apache(){
     # ls -la "$APACHE_SSL_DIR"
 
     echo ""
