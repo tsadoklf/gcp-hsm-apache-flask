@@ -1,0 +1,68 @@
+version: '3.8'
+
+networks:
+  app-network:
+    name: app-network
+    driver: bridge
+
+services:
+  flask-app:
+    container_name: flask-app
+    platform: linux/amd64
+    build:
+      context: ./flask-app
+      dockerfile: Dockerfile
+    env_file:
+      - ./flask-app/.env
+    volumes:
+      - ${PWD}/.credentials/storage-sa-private-key.json:/app/secrets/storage-sa-private-key.json
+    expose:
+      - "5000"
+    networks:
+      - app-network
+
+  apache-server:
+    container_name: apache-server
+    platform: linux/amd64
+    build:
+      context: ./apache-server
+      dockerfile: Dockerfile
+    # hostname: localhost
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - flask-app
+    volumes:
+      - ${PWD}/.credentials/kms-sa-private-key.json:/app/secrets/kms-sa-private-key.json
+      - ${PWD}/ssl:/etc/apache2/ssl
+      - ${PWD}/log/apache2:/var/log/apache2
+      - ${PWD}/log/letsencrypt:/var/log/letsencrypt/
+    env_file:
+      - ./apache-server/.env
+    networks:
+      - app-network
+
+  # certbot:
+  #   container_name: certbot
+  #   platform: linux/amd64
+  #   build:
+  #     context: ./certbot
+  #     dockerfile: Dockerfile
+  #   # ports:
+  #   #   - "80:80"
+  #   #   - "443:443"
+  #   depends_on:
+  #     - apache-server
+  #   volumes:
+  #     - ${PWD}/.credentials/kms-sa-private-key.json:/app/secrets/kms-sa-private-key.json
+  #     - ${PWD}/ssl:/etc/apache2/ssl
+  #     # - ${PWD}/log/apache2:/var/log/apache2
+  #     - ${PWD}/log/letsencrypt:/var/log/letsencrypt/
+  #   env_file:
+  #     - ./certbot/.env
+  #   networks:
+  #     - app-network      
+
+   
+
