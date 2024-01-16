@@ -5,9 +5,8 @@ from dotenv import load_dotenv
 import os
 import ssl
 import logging
-
-# context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
-# context.load_cert_chain('/etc/apache2/ssl/my-self-signed-certificate.crt', 'pkcs11:object=resec-hsm-key')
+from collections import defaultdict
+import datetime
 
 # Load environment variables from .env file
 load_dotenv()
@@ -45,17 +44,93 @@ def set_logging():
     logger.addHandler(ch)
 
     # Test messages
-    logger.debug('This is a debug message')
-    logger.info('This is an info message')
-    logger.warning('This is a warning message')
-    logger.error('This is an error message')
-    logger.critical('This is a critical message')
+    # logger.debug('This is a debug message')
+    # logger.info('This is an info message')
+    # logger.warning('This is a warning message')
+    # logger.error('This is an error message')
+    # logger.critical('This is a critical message')
 
     return logger
 
 
 def is_user_logged_in():
     return 'username' in session
+
+# def parse_blobs(blobs):
+#     file_structure = defaultdict(list)
+#     for blob in blobs:
+#         path_parts = blob.name.split('/')
+#         current_level = file_structure
+#         for part in path_parts[:-1]:
+#             current_level = current_level[part]
+#         current_level.append({
+#             "name": path_parts[-1],
+#             "url": blob.generate_signed_url(expiration=timedelta(minutes=60))
+#         })
+#     return file_structure
+
+def parse_blobs(blobs):       
+    def insert_into_structure(structure, blob):
+
+        # take the left most part of the path
+        path_parts = blob.name.split('/')
+        logger.info('path_parts: ' + str(path_parts))
+
+        #  left most part of the path
+        # part = path_parts[0]
+
+        logger.info('blob.name: ' + blob.name)
+        
+        # remove empty string from path_parts
+        path_parts = list(filter(None, path_parts))
+
+        logger.info('path_parts: ' + str(path_parts))
+        logger.info('path_parts[-1]: ' + path_parts[-1])
+        logger.info('path_parts[:-1]: ' + str(path_parts[:-1]))
+        
+        if not path_parts:  # Add this line to check if path_parts is empty
+            logger.info('path_parts is empty')
+            return  # Skip this blob as it seems to have an empty name
+        
+        for part in path_parts[:-1]:  # Add this line to check if part is empty
+            if part != '': structure = structure.setdefault(part, {"files": [], "directories": defaultdict(dict)})
+
+        # direcotry name or file name
+        path = path_parts[:-1]
+        name = path_parts[-1]
+        logger.info('name: ' + name)
+        
+        # if '/' in blob.name:  # It's a directory
+        if blob.name.endswith('/'):
+            logger.info('It is a directory')
+            logger.info('blob.name: ' + blob.name)
+            subdirectory_structure = structure["directories"].setdefault(name, {"files": [], "directories": defaultdict(dict)})
+
+            # If the blob is a directory, make a recursive call to insert into the subdirectory structure.
+            # insert_into_structure(subdirectory_structure, path_parts[1:], blob)
+        else:  # It's a file
+            logger.info('It is a file')
+            structure["files"].append({
+                "name": name,
+                "size": blob.size,
+                "last_modified": blob.updated.strftime("%Y-%m-%d %H:%M:%S"),
+                "url": blob.generate_signed_url(expiration=timedelta(minutes=60)),
+                "is_directory": False
+            })    
+
+    file_structure = defaultdict(dict)
+    for blob in blobs:
+        insert_into_structure(file_structure, blob)
+        logger.info("")
+
+                # get bucket data as blob
+        # blob = bucket.get_blob('testdata.xml')
+        # convert to string
+        if blob.name.endswith('/'):
+            json_data = blob.download_as_string()
+            logger.info('json_data: ' + str(json_data))
+
+    return file_structure
 
 @app.route('/')
 def home():
@@ -71,7 +146,8 @@ def login():
 
         if username in users and users[username] == password:
             session['username'] = username  # Store username in session
-            return redirect(url_for('browse'))
+            # return redirect(url_for('browse'))
+            return redirect(url_for('browse_files'))
         else:
             return "Invalid credentials", 401
 
@@ -106,8 +182,18 @@ def browse():
 
     bucket = client.get_bucket(bucket_name)  
 
+    blobs = bucket.list_blobs( include_trailing_delimiter=False)
+    for blob in blobs:
+        if blob.name.endswith('/'):
+            logger.info(f'{blob.name} is a directory')
+        else:
+            logger.info(f'{blob.name} is a file')
+
+    logger.info("===========================================")
+
     # List files and directories in the bucket
-    blobs = bucket.list_blobs()
+    # blobs = bucket.list_blobs()
+    # files = parse_blobs(blobs)
     
     files = [{
         "name": blob.name,
@@ -115,6 +201,72 @@ def browse():
     } for blob in blobs]
 
     return render_template('browse.html', files=files)
+
+# ================================================================
+
+@app.route('/browse_files')
+def browse_files():
+    # Replace 'your_directory_path' with the path of your directory
+    directory = './../data'
+    file_tree = get_file_tree(directory)
+
+    # print("===========================================")
+    print(file_tree)
+    return render_template('browse_files.html', files=file_tree)
+
+# def get_file_tree(directory, parent_path=''):
+#     """
+#     Recursively builds a file tree.
+#     """
+#     file_tree = []
+#     for filename in os.listdir(directory):
+#         filepath = os.path.join(directory, filename)
+#         if os.path.isdir(filepath):
+#             file_tree.append({
+#                 'type': 'directory',
+#                 'name': filename,
+#                 'path': os.path.join(parent_path, filename),
+#                 'children': get_file_tree(filepath, os.path.join(parent_path, filename))
+#             })
+#         else:
+#             file_tree.append({
+#                 'type': 'file',
+#                 'name': filename,
+#                 'path': os.path.join(parent_path, filename)
+#             })
+#     return file_tree
+
+# def get_file_tree(directory, parent_path=''):
+#     file_tree = {'files': [], 'directories': {}}
+#     for filename in os.listdir(directory):
+#         filepath = os.path.join(directory, filename)
+#         if os.path.isdir(filepath):
+#             file_tree['directories'][filename] = get_file_tree(filepath, os.path.join(parent_path, filename))
+#         else:
+#             file_stats = os.stat(filepath)
+#             file_tree['files'].append({
+#                 'name': filename,
+#                 'url': os.path.join(parent_path, filename),  # Modify as needed
+#                 'size': file_stats.st_size,
+#                 'last_modified': datetime.datetime.fromtimestamp(file_stats.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
+#             })
+#     return file_tree
+
+def get_file_tree(directory, parent_path=''):
+    file_tree = {'files': [], 'directories': {}}
+    for filename in os.listdir(directory):
+        filepath = os.path.join(directory, filename)
+        if os.path.isdir(filepath):
+            file_tree['directories'][filename] = get_file_tree(filepath, os.path.join(parent_path, filename))
+        else:
+            file_stats = os.stat(filepath)
+            file_tree['files'].append({
+                'name': filename,
+                'url': os.path.join(parent_path, filename),  # Modify as needed
+                'size': file_stats.st_size,
+                'last_modified': datetime.datetime.fromtimestamp(file_stats.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
+            })
+    return file_tree
 
 if __name__ == '__main__':
   
@@ -130,3 +282,10 @@ if __name__ == '__main__':
     logger.info('Starting flask-app...')
     
     app.run(host=os.getenv('APP_HOST'),port=os.getenv('APP_PORT'),debug=True)
+
+
+
+
+
+
+

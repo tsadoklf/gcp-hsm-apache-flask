@@ -18,10 +18,10 @@ KEY_VERSION="4"
 
 APACHE_SSL_DIR="/etc/apache2/ssl"
 
-SELF_SIGNED_CERTIFICATE="self-signed-certificate.crt"
+CERTIFICATE_FILE="certificate.crt"
 CERTIFICATE_SIGNING_REQUEST_FILE="$APACHE_SSL_DIR/certificate-signing-request.csr"
 
-CERT_FILE="$APACHE_SSL_DIR/$SELF_SIGNED_CERTIFICATE"
+CERT_FILE="$APACHE_SSL_DIR/$CERTIFICATE_FILE"
 CERT_KEY_FILE="pkcs11:object=$KEY_NAME"
 # CERT_KEY_FILE="pkcs11:id=$KEY_IDENTIFIER"
 CERT_CHAIN_FILE="$APACHE_SSL_DIR/certificates-chain.pem"
@@ -29,7 +29,7 @@ CERT_CHAIN_FILE="$APACHE_SSL_DIR/certificates-chain.pem"
 # certificate information
 COUNTRY_CODE="IL"
 COMMON_NAME="$SERVER_NAME"
-ORGANIZATION_NAME="Tsadok Ltd."
+ORGANIZATION_NAME="Resec Technologies"
 # "/C=US/ST=State/L=City/O=Organization Name/CN=www.example.com"
 SUBJECT="/C=$COUNTRY_CODE/CN=$COMMON_NAME/O=$ORGANIZATION_NAME"
 
@@ -97,9 +97,9 @@ function create_certificate_signing_request(){
     openssl req -new -subj "$SUBJECT" -sha256 -engine pkcs11 -keyform engine -key pkcs11:object="$KEY_NAME" > "$CERTIFICATE_SIGNING_REQUEST_FILE" 
 }
 # https://hsm.resec.co/
-function request_certificate(){
+function request_letsencrypt_certificate(){
 
-    if [[ "$USE_TEST_CERT" == "true" ]]; then
+    if [[ "$CERTIFICATE_AUTHORITY" == "letsencrypt-staging" ]]; then
         echo ""
         echo "Requesting a certificate from Let's Encrypt (staging) ..."
         echo ""
@@ -129,7 +129,7 @@ function request_certificate(){
         echo "Moving certificate files to $APACHE_SSL_DIR ..."
 
         # The primary certificate file for the domain
-        mv --force 0000_cert.pem "$APACHE_SSL_DIR/$SELF_SIGNED_CERTIFICATE"
+        mv --force 0000_cert.pem "$APACHE_SSL_DIR/$CERTIFICATE_FILE"
 
         # The intermediate certificate(s) that help browsers and other clients 
         # trust the certificate by linking it to a trusted root certificate
@@ -152,13 +152,13 @@ function create_self_signed_certificate(){
     local KEY="pkcs11:object=$KEY_NAME"
     # local KEY="pkcs11:id=$KEY_IDENTIFIER"
     
-    # openssl req -new -x509 -days 3650 -subj "$SUBJECT" -sha256 -engine pkcs11 -keyform engine -key "$KEY" -config "$OPENSSL_SERVER_CERTIFICATE_CONFIG" > "$SELF_SIGNED_CERTIFICATE" 
+    # openssl req -new -x509 -days 3650 -subj "$SUBJECT" -sha256 -engine pkcs11 -keyform engine -key "$KEY" -config "$OPENSSL_SERVER_CERTIFICATE_CONFIG" > "$CERTIFICATE_FILE" 
 
     # '/CN=localhost'
     # -keyout localhost.key
     openssl req -new -x509 -days 3650 \
         -engine pkcs11 -keyform engine -key "$KEY" \
-        -out "$SELF_SIGNED_CERTIFICATE"  \
+        -out "$CERTIFICATE_FILE"  \
         -newkey rsa:2048 -nodes -sha256 \
         -subj "$SUBJECT" -extensions EXT \
         -config <( printf "[dn]\nCN=$COMMON_NAME\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:$COMMON_NAME\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
@@ -170,11 +170,11 @@ function copy_self_signed_certificate(){
     echo ""
 
     mkdir -p "$APACHE_SSL_DIR"
-    cp "$SELF_SIGNED_CERTIFICATE"  "$APACHE_SSL_DIR/$SELF_SIGNED_CERTIFICATE"
+    cp "$CERTIFICATE_FILE"  "$APACHE_SSL_DIR/$CERTIFICATE_FILE"
 
-    chown root:root "$APACHE_SSL_DIR/$SELF_SIGNED_CERTIFICATE"
-    # chown 600 "$APACHE_SSL_DIR/$SELF_SIGNED_CERTIFICATE"
-    chmod 600 "$APACHE_SSL_DIR/$SELF_SIGNED_CERTIFICATE"
+    chown root:root "$APACHE_SSL_DIR/$CERTIFICATE_FILE"
+    # chown 600 "$APACHE_SSL_DIR/$CERTIFICATE_FILE"
+    chmod 600 "$APACHE_SSL_DIR/$CERTIFICATE_FILE"
 }
 
 function create_apache_config(){
@@ -208,14 +208,11 @@ function enable_apache_modules_and_config(){
 
     echo ""
     echo "Enabling the 'mod_proxy' module in Apache ..."
-    # sudo a2enmod proxy
-    # sudo a2enmod proxy_http
     a2enmod proxy
     a2enmod proxy_http
 
     echo ""
-    echo "sudo a2ensite /etc/apache2/sites-available/$APACHE_CONFIG"
-    # sudo a2ensite "$APACHE_CONFIG"
+    echo "a2ensite $APACHE_CONFIG"
     a2ensite "$APACHE_CONFIG"
 }
 function start_apache(){
@@ -244,27 +241,77 @@ function verify_apache(){
     apachectl configtest
 }
 
+function validate_env_vars(){
+    if [[ -z "$SERVER_NAME" ]]; then
+        echo ""
+        echo "ERROR: SERVER_NAME is empty."
+        echo ""
+        exit 1
+    fi
+
+    if [[ -z "$CERTIFICATE_AUTHORITY" ]]; then
+        echo ""
+        echo "ERROR: CERTIFICATE_AUTHORITY is empty."
+        echo ""
+        exit 1
+    fi
+
+    if [[ "$SERVER_NAME" == "localhost" && "$CERTIFICATE_AUTHORITY" != "self-signed" ]]; then
+        echo ""
+        echo "ERROR: SERVER_NAME cannot be 'localhost' when using a certificate authority other than 'self-signed'."
+        echo ""
+        exit 1
+    fi
+
+}
+
+function create_certificate(){
+
+    case "$CERTIFICATE_AUTHORITY" in
+        "letsencrypt-staging"|"letsencrypt-production")
+            create_certificate_signing_request
+            request_letsencrypt_certificate
+            ;;
+        "self-signed")
+            echo ""
+            echo "Using a self-signed certificate ..."
+            echo ""
+            create_self_signed_certificate
+            copy_self_signed_certificate
+            ;;
+        *)
+            echo "Usage: $0 [letsencrypt-staging|letsencrypt-production|self-signed]"
+            exit 1
+            ;;
+    esac
+}
+
+validate_env_vars
 create_apache_envvars
-
-create_self_signed_certificate
-copy_self_signed_certificate
-
 create_apache_config
 enable_apache_modules_and_config
-start_apache
-verify_apache
 
-create_certificate_signing_request
-request_certificate
+# Check if the certificate (/etc/apache2/ssl/certificate.crt) exists
+# If it does not exist, create a self-signed certificate
+if [ ! -f "$CERT_FILE" ]; then
+    echo "Certificate does not exists. Creating self signed certificate ..."
+    create_self_signed_certificate
+    copy_self_signed_certificate
+    SELF_SIGNED_CERTIFICATE_CREATED="true"
 
-# echo ""
-# echo "Restarting Apache with USE_CHAIN_FILE ..."
-# apachectl -D USE_CHAIN_FILE -k graceful
+    start_apache
+    verify_apache
 
-# echo "Keeping Apache running in the foreground ..."
-# apachectl -D USE_CHAIN_FILE -D FOREGROUND
+    # If the certificate is self-signed, exit
+    # If the certificate is not self-signed, create a certificate signing request and request a certificate from Let's Encrypt
+    create_certificate
+    stop_apache
+fi
 
-stop_apache
-
-echo "Starting Apache in the foreground ..."
-exec "$@"
+if [[ "$CERTIFICATE_AUTHORITY" == "letsencrypt-staging" || "$CERTIFICATE_AUTHORITY" == "letsencrypt-production" ]]; then
+    echo -e "\nStarting Apache in the foreground with a certificate from Let's Encrypt."
+    exec apachectl -D FOREGROUND -D USE_CHAIN_FILE
+else
+    echo -e "\nStarting Apache in the foreground with a self-signed certificate."
+    exec apachectl -D FOREGROUND 
+fi

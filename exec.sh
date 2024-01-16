@@ -1,7 +1,10 @@
 #!/bin/bash
 set -e
 
-# Usage ./docker/build.sh [build|run]
+function usage(){
+    echo "Usage: $0 <up|up-bg|down|dn|logs|logs-apache|logs-flask-app|logs-flask|logs-app>"
+    exit 1
+}
 
 function cleanup(){
     echo ""
@@ -10,24 +13,30 @@ function cleanup(){
     rm -rf ./ssl
 }
 
-IMAGE_NAME="my-flask-app"
-
 COMMAND="$1"
 case "$COMMAND" in
-    "build")
-        echo "Building Docker image ..."
-        docker build -t $IMAGE_NAME -f docker/Dockerfile .
-        ;;
-    "run")
+    "up")
         cleanup
 
-        docker compose -f docker-compose.yaml up --build 
+        docker compose -f docker-compose.yaml up --build --remove-orphans
         ;;
-    "run-bg")
-        docker compose -f docker-compose.yaml up --build -d
+    "up-bg")
+        cleanup
+        docker compose -f docker-compose.yaml up --build -d --remove-orphans
+        ;;
+    "down"|"dn")
+        docker compose -f docker-compose.yaml down
+        ;;
+    "logs")
+        docker compose -f docker-compose.yaml logs -f
+        ;;
+    "logs-apache")
+        docker compose -f docker-compose.yaml logs apache-server -f
+        ;;
+    "logs-flask-app"| "logs-flask"| "logs-app")
+        docker compose -f docker-compose.yaml logs flask-app -f
         ;;
     *)
-        echo "Usage: $0 [build|run]"
-        exit 1
+        usage
         ;;
 esac

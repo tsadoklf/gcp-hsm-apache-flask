@@ -54,4 +54,4 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["entrypoint.sh"]
 
 # Start Apache in the foreground
-CMD ["apache2ctl", "-D", "FOREGROUND", "-D", "USE_CHAIN_FILE"]
+# CMD ["apache2ctl", "-D", "FOREGROUND", "-D", "USE_CHAIN_FILE"]
