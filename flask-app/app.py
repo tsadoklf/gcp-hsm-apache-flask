@@ -136,7 +136,7 @@ def parse_blobs(blobs):
 @app.route('/')
 def home():
     app.logger.info('Route / accessed')
-    return redirect(url_for('login'))
+    return redirect(url_for('browse_files'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
