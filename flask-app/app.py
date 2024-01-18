@@ -54,7 +54,8 @@ def set_logging():
 
 
 def is_user_logged_in():
-    return 'username' in session
+    return true
+    # 'username' in session
 
 # def parse_blobs(blobs):
 #     file_structure = defaultdict(list)
