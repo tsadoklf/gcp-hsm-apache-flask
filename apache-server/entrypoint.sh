@@ -338,13 +338,26 @@ if [[ ! -z "$CERTIFICATE_SIGNING_REQUEST_FILE" && -f "$CERTIFICATE_SIGNING_REQUE
     echo "Verifying certificate signing request ..."
     verify_certificate_signing_request
 fi
-    
-if [[ "$CERTIFICATE_AUTHORITY" == "letsencrypt-staging" || "$CERTIFICATE_AUTHORITY" == "letsencrypt-production" || "$CERTIFICATE_AUTHORITY" == "godaddy-production"  ]]; then
-    echo -e "\nStarting Apache in the foreground with a certificate from Let's Encrypt."
-    exec apachectl -D FOREGROUND -D USE_CHAIN_FILE
-else
-    echo -e "\nStarting Apache in the foreground with a self-signed certificate."
-    exec apachectl -D FOREGROUND 
-fi
 
 verify_apache
+
+case "$CERTIFICATE_AUTHORITY" in 
+    "letsencrypt-staging"|"letsencrypt-production")
+        echo -e "\nStarting Apache in the foreground with a certificate from Let's Encrypt."
+        exec apachectl -D FOREGROUND -D USE_CHAIN_FILE
+        ;;
+    "godaddy-production" )
+        echo -e "\nStarting Apache in the foreground with a certificate from GoDaddy."
+        exec apachectl -D FOREGROUND -D USE_CHAIN_FILE
+        ;;
+    "self-signed")
+        echo -e "\nStarting Apache in the foreground with a self-signed certificate."
+        exec apachectl -D FOREGROUND 
+        ;;
+    *)
+        echo "Usage: $0 [letsencrypt-staging|letsencrypt-production|self-signed|godaddy-production]"
+        exit 1
+        ;;
+esac
+
+
