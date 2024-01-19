@@ -143,6 +143,23 @@ function request_letsencrypt_certificate(){
     fi
 }
 
+function verify_certificate_signing_request(){
+
+    local hsm_public_key_file="$APACHE_SSL_DIR/hsm-public-key.pem"
+    local csr_public_key_file="$APACHE_SSL_DIR/csr-public-key.pem"
+    
+    # gcloud kms keys versions get-public-key "$KEY_VERSION" \
+    #     --location "$LOCATION" \
+    #     --keyring "$KEY_RING" \
+    #     --key "$KEY_NAME" \
+    #     --output-file "$hsm_public_key_file"
+
+    # openssl pkey -in "$hsm_public_key_file" -pubin -text
+
+    openssl req -in "$CERTIFICATE_SIGNING_REQUEST_FILE" -noout -pubkey -out "$csr_public_key_file"
+    openssl pkey -in "$csr_public_key_file" -pubin -text
+}
+
 function create_self_signed_certificate(){
 
     local OPENSSL_SERVER_CERTIFICATE_CONFIG="openssl_server_certificate.config"
@@ -256,6 +273,14 @@ function validate_env_vars(){
         exit 1
     fi
 
+    if [[ "$CERTIFICATE_AUTHORITY" != "self-signed" && "$CERTIFICATE_AUTHORITY" != "letsencrypt-staging" && "$CERTIFICATE_AUTHORITY" != "letsencrypt-production" && "$CERTIFICATE_AUTHORITY" != "godaddy-production" ]]; then
+        echo ""
+        echo "ERROR: CERTIFICATE_AUTHORITY must be one of the following: 'self-signed', 'letsencrypt-staging', 'letsencrypt-production' or 'godaddy-production'."
+        echo ""
+        exit 1
+
+    fi
+
     if [[ "$SERVER_NAME" == "localhost" && "$CERTIFICATE_AUTHORITY" != "self-signed" ]]; then
         echo ""
         echo "ERROR: SERVER_NAME cannot be 'localhost' when using a certificate authority other than 'self-signed'."
@@ -308,10 +333,18 @@ if [ ! -f "$CERT_FILE" ]; then
     stop_apache
 fi
 
-if [[ "$CERTIFICATE_AUTHORITY" == "letsencrypt-staging" || "$CERTIFICATE_AUTHORITY" == "letsencrypt-production" ]]; then
+if [[ ! -z "$CERTIFICATE_SIGNING_REQUEST_FILE" && -f "$CERTIFICATE_SIGNING_REQUEST_FILE" ]]; then
+    echo ""
+    echo "Verifying certificate signing request ..."
+    verify_certificate_signing_request
+fi
+    
+if [[ "$CERTIFICATE_AUTHORITY" == "letsencrypt-staging" || "$CERTIFICATE_AUTHORITY" == "letsencrypt-production" || "$CERTIFICATE_AUTHORITY" == "godaddy-production"  ]]; then
     echo -e "\nStarting Apache in the foreground with a certificate from Let's Encrypt."
     exec apachectl -D FOREGROUND -D USE_CHAIN_FILE
 else
     echo -e "\nStarting Apache in the foreground with a self-signed certificate."
     exec apachectl -D FOREGROUND 
 fi
+
+verify_apache
