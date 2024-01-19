@@ -33,6 +33,8 @@ ORGANIZATION_NAME="Resec Technologies"
 # "/C=US/ST=State/L=City/O=Organization Name/CN=www.example.com"
 SUBJECT="/C=$COUNTRY_CODE/CN=$COMMON_NAME/O=$ORGANIZATION_NAME"
 
+APACHE_GLOBAL_CONFIG="/etc/apache2/apache2.conf"
+
 APACHE_CONFIG_TEMPLATE="/usr/src/config/apache/apache.config.templ"
 APACHE_CONFIG="000-default.conf"
 DOCUMENT_ROOT="$HOME/website"
@@ -54,7 +56,26 @@ function update_env_var() {
     fi
 }
 
-function create_apache_envvars(){
+function update_config(){
+    local config_file="$1"
+    local var_name="$2"
+    local var_value="$3"
+
+    # Check if the variable definition exists in the file
+    if grep -q "$var_name" "$config_file"; then
+        # Variable exists; update its value using sed
+        sed -i "s#$var_name .*#$var_name=\"$var_value\"#" "$config_file"
+    else
+        # Variable does not exist; add it to the end of the file using tee
+        echo "$var_name \"$var_value\"" | tee -a "$config_file" >/dev/null
+    fi
+}
+
+function update_apache_global_config(){
+    update_config "$APACHE_GLOBAL_CONFIG" "ServerName" "$SERVER_NAME"
+}
+
+function update_apache_envvars(){
     local ENV_VARS_FILE="/etc/apache2/envvars"
 
     # local PKCS11_MODULE_PATH="/usr/lib/x86_64-linux-gnu/engines-1.1/kms11/libkmsp11-1.2-linux-amd64/libkmsp11.so"
@@ -312,7 +333,8 @@ function create_certificate(){
 }
 
 validate_env_vars
-create_apache_envvars
+update_apache_global_config
+update_apache_envvars
 create_apache_config
 enable_apache_modules_and_config
 
