@@ -24,7 +24,7 @@ CERTIFICATE_SIGNING_REQUEST_FILE="$APACHE_SSL_DIR/certificate-signing-request.cs
 CERT_FILE="$APACHE_SSL_DIR/$CERTIFICATE_FILE"
 CERT_KEY_FILE="pkcs11:object=$KEY_NAME"
 # CERT_KEY_FILE="pkcs11:id=$KEY_IDENTIFIER"
-CERT_CHAIN_FILE="$APACHE_SSL_DIR/certificates-chain.pem"
+CERT_CHAIN_FILE="$APACHE_SSL_DIR/certificates-chain.crt"
 
 # certificate information
 COUNTRY_CODE="IL"
@@ -154,7 +154,7 @@ function request_letsencrypt_certificate(){
 
         # The intermediate certificate(s) that help browsers and other clients 
         # trust the certificate by linking it to a trusted root certificate
-        mv --force 0000_chain.pem "$APACHE_SSL_DIR/certificates-chain.pem"
+        mv --force 0000_chain.pem "$APACHE_SSL_DIR/certificates-chain.crt"
 
         # This may be an alternative or additional chain file. 
         # Sometimes, Let's Encrypt provides different chain options for compatibility reasons
@@ -294,9 +294,9 @@ function validate_env_vars(){
         exit 1
     fi
 
-    if [[ "$CERTIFICATE_AUTHORITY" != "self-signed" && "$CERTIFICATE_AUTHORITY" != "letsencrypt-staging" && "$CERTIFICATE_AUTHORITY" != "letsencrypt-production" && "$CERTIFICATE_AUTHORITY" != "godaddy-production" ]]; then
+    if [[ "$CERTIFICATE_AUTHORITY" != "self-signed" && "$CERTIFICATE_AUTHORITY" != "letsencrypt-staging" && "$CERTIFICATE_AUTHORITY" != "letsencrypt-production" && "$CERTIFICATE_AUTHORITY" != "comodo-production" ]]; then
         echo ""
-        echo "ERROR: CERTIFICATE_AUTHORITY must be one of the following: 'self-signed', 'letsencrypt-staging', 'letsencrypt-production' or 'godaddy-production'."
+        echo "ERROR: CERTIFICATE_AUTHORITY must be one of the following: 'self-signed', 'letsencrypt-staging', 'letsencrypt-production' or 'comodo-production'."
         echo ""
         exit 1
 
@@ -368,8 +368,8 @@ case "$CERTIFICATE_AUTHORITY" in
         echo -e "\nStarting Apache in the foreground with a certificate from Let's Encrypt."
         exec apachectl -D FOREGROUND -D USE_CHAIN_FILE
         ;;
-    "godaddy-production" )
-        echo -e "\nStarting Apache in the foreground with a certificate from GoDaddy."
+    "comodo-production" )
+        echo -e "\nStarting Apache in the foreground with a certificate from Comodo."
         exec apachectl -D FOREGROUND -D USE_CHAIN_FILE
         ;;
     "self-signed")
@@ -377,7 +377,7 @@ case "$CERTIFICATE_AUTHORITY" in
         exec apachectl -D FOREGROUND 
         ;;
     *)
-        echo "Usage: $0 [letsencrypt-staging|letsencrypt-production|self-signed|godaddy-production]"
+        echo "Usage: $0 [letsencrypt-staging|letsencrypt-production|self-signed|comodo-production]"
         exit 1
         ;;
 esac

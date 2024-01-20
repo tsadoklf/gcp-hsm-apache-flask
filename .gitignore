@@ -167,7 +167,5 @@ cython_debug/
 
 .backup
 .credentials
-.certificates
 .log
-.ssl
 data
