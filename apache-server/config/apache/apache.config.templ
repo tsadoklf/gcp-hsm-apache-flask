@@ -16,7 +16,7 @@
     </IfDefine>
 
     # added by Amir to attempt downloading files instead of showing them
-    <Directory >
+    <Directory gcp-hsm-apache-flask/data>
         <FilesMatch "\.(sig|zip|pdf)$">
             ForceType application/octet-stream
             Header set Content-Disposition attachment
