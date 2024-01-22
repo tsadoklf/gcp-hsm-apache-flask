@@ -16,12 +16,18 @@
     </IfDefine>
 
     # added by Amir to attempt downloading files instead of showing them
-    <Directory gcp-hsm-apache-flask/data>
-        <FilesMatch "\.(sig|zip|pdf)$">
-            ForceType application/octet-stream
-            Header set Content-Disposition attachment
-        </FilesMatch>
-    </Directory>
+    <Location gcp-hsm-apache-flask/data>
+        SetEnvIf Request_URI "^.*/([^/]*)$" FILENAME=$1
+        Header set "Content-disposition" "attachment; filename=%{FILENAME}e"
+        UnsetEnv FILENAME
+    </Location>
+    
+    #<Directory gcp-hsm-apache-flask/data>
+    #    <FilesMatch "\.(sig|zip|pdf)$">
+    #        ForceType application/octet-stream
+    #        Header set Content-Disposition attachment
+    #    </FilesMatch>
+    #</Directory>
 
     # Additional SSL configuration can be added here.
     
