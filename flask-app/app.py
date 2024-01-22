@@ -170,6 +170,7 @@ def list_files():
 # -------------------------------------------
 @app.route('/download/<path:filename>')
 def download_one_file(filename):
+    folder_path = './../data'
     return send_from_directory(directory=folder_path, path=filename, as_attachment=True)
 # -------------------------------------------
 # @app.route('/download/<filename>')
