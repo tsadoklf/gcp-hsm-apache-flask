@@ -15,6 +15,14 @@
         SSLCertificateChainFile {{CERT_CHAIN_FILE}}
     </IfDefine>
 
+    # added by Amir to attempt downloading files instead of showing them
+    <Directory >
+        <FilesMatch "\.(sig|zip|pdf)$">
+            ForceType application/octet-stream
+            Header set Content-Disposition attachment
+        </Files>
+    </Directory>
+
     # Additional SSL configuration can be added here.
     
     # Reverse proxy configuration
@@ -23,6 +31,8 @@
     ProxyPassReverse / {{FLASK_APP}}
 
 </VirtualHost>
+
+
 <VirtualHost *:80>
     ServerName {{SERVER_NAME}}
     DocumentRoot /var/www/html
