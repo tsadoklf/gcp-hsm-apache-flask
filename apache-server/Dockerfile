@@ -18,6 +18,9 @@ RUN pip install mod_wsgi
 # Enable SSL module
 RUN a2enmod ssl
 
+# Enable Headers module
+RUN a2enmod headers
+
 # Install mod_wsgi
 RUN mod_wsgi-express install-module > /etc/apache2/mods-available/wsgi.load
 
