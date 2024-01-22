@@ -8,6 +8,9 @@ import logging
 from collections import defaultdict
 import datetime
 
+# --- Amir
+from flask import Flask, send_file
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -20,6 +23,7 @@ users = {
     "user2": "password2"
 }
 
+# -------------------------------------------
 def set_logging():
 
     # Create a logger
@@ -52,24 +56,11 @@ def set_logging():
 
     return logger
 
-
+# -------------------------------------------
 def is_user_logged_in():
-    return true
-    # 'username' in session
+    'username' in session
 
-# def parse_blobs(blobs):
-#     file_structure = defaultdict(list)
-#     for blob in blobs:
-#         path_parts = blob.name.split('/')
-#         current_level = file_structure
-#         for part in path_parts[:-1]:
-#             current_level = current_level[part]
-#         current_level.append({
-#             "name": path_parts[-1],
-#             "url": blob.generate_signed_url(expiration=timedelta(minutes=60))
-#         })
-#     return file_structure
-
+# -------------------------------------------
 def parse_blobs(blobs):       
     def insert_into_structure(structure, blob):
 
@@ -133,11 +124,14 @@ def parse_blobs(blobs):
 
     return file_structure
 
+# -------------------------------------------
 @app.route('/')
 def home():
     app.logger.info('Route / accessed')
-    return redirect(url_for('browse_files'))
+    # return redirect(url_for('browse_files'))
+    return redirect(url_for('list_files'))
 
+# -------------------------------------------
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     app.logger.info('Route /login accessed')
@@ -154,11 +148,33 @@ def login():
 
     return render_template('login.html')
 
+# -------------------------------------------
 @app.route('/logout')
 def logout():
     session.pop('username', None)  # Remove username from session
     return redirect(url_for('login'))
 
+# -------------------------------------------
+# -------------------------------------------
+@app.route('/')
+def list_files():
+    folder_path = './../data'
+    file_list = os.listdir(folder_path)
+    list_html = '<ul>'
+    for file in file_list:
+        list_html += f'<li><a href="/download/{file}">{file}</a></li>'
+    list_html += '</ul>'
+    return list_html
+
+# -------------------------------------------
+@app.route('/download/<filename>')
+def download_one_file(filename):
+    file_path = os.path.join(folder_path, filename)
+    return send_file(file_path, as_attachment=True)
+# -------------------------------------------
+# -------------------------------------------
+
+# -------------------------------------------
 @app.route('/browse')
 def browse():
     app.logger.info('Route /browse accessed')
@@ -205,6 +221,7 @@ def browse():
 
 # ================================================================
 
+# -------------------------------------------
 @app.route('/browse_files')
 def browse_files():
     # Replace 'your_directory_path' with the path of your directory
@@ -215,44 +232,7 @@ def browse_files():
     print(file_tree)
     return render_template('browse_files.html', files=file_tree)
 
-# def get_file_tree(directory, parent_path=''):
-#     """
-#     Recursively builds a file tree.
-#     """
-#     file_tree = []
-#     for filename in os.listdir(directory):
-#         filepath = os.path.join(directory, filename)
-#         if os.path.isdir(filepath):
-#             file_tree.append({
-#                 'type': 'directory',
-#                 'name': filename,
-#                 'path': os.path.join(parent_path, filename),
-#                 'children': get_file_tree(filepath, os.path.join(parent_path, filename))
-#             })
-#         else:
-#             file_tree.append({
-#                 'type': 'file',
-#                 'name': filename,
-#                 'path': os.path.join(parent_path, filename)
-#             })
-#     return file_tree
-
-# def get_file_tree(directory, parent_path=''):
-#     file_tree = {'files': [], 'directories': {}}
-#     for filename in os.listdir(directory):
-#         filepath = os.path.join(directory, filename)
-#         if os.path.isdir(filepath):
-#             file_tree['directories'][filename] = get_file_tree(filepath, os.path.join(parent_path, filename))
-#         else:
-#             file_stats = os.stat(filepath)
-#             file_tree['files'].append({
-#                 'name': filename,
-#                 'url': os.path.join(parent_path, filename),  # Modify as needed
-#                 'size': file_stats.st_size,
-#                 'last_modified': datetime.datetime.fromtimestamp(file_stats.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
-#             })
-#     return file_tree
-
+# -------------------------------------------
 def get_file_tree(directory, parent_path=''):
     file_tree = {'files': [], 'directories': {}}
     for filename in os.listdir(directory):
@@ -271,6 +251,7 @@ def get_file_tree(directory, parent_path=''):
             })
     return file_tree
 
+# -------------------------------------------
 @app.route('/download/<path:filename>')
 def download_file(filename):
     directory = './../data'
