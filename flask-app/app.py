@@ -263,8 +263,8 @@ def get_file_tree(directory, parent_path=''):
             file_stats = os.stat(filepath)
             file_tree['files'].append({
                 'name': filename,
-                # 'url': os.path.join(parent_path, filename),  # Modify as needed
-                'download_url': url_for('download_file', filename=os.path.join(parent_path, filename)),
+                'url': os.path.join(parent_path, filename),  # Modify as needed
+                #   'download_url': url_for('download_file', filename=os.path.join(parent_path, filename)),
                 'size': file_stats.st_size,
                 'last_modified': datetime.datetime.fromtimestamp(file_stats.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
             })
