@@ -156,7 +156,7 @@ def logout():
 
 # -------------------------------------------
 # -------------------------------------------
-@app.route('/')
+@app.route('/list_files')
 def list_files():
     folder_path = './../data'
     file_list = os.listdir(folder_path)
