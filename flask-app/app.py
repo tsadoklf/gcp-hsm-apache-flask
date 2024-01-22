@@ -269,6 +269,11 @@ def get_file_tree(directory, parent_path=''):
             })
     return file_tree
 
+@app.route('/download/<path:filename>')
+def download_file(filename):
+    directory = './../data'
+    return send_from_directory(directory, filename, as_attachment=True)
+
 if __name__ == '__main__':
   
     # Set up basic logging
