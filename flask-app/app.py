@@ -258,13 +258,14 @@ def get_file_tree(directory, parent_path=''):
     for filename in os.listdir(directory):
         filepath = os.path.join(directory, filename)
         if os.path.isdir(filepath):
+            # display folders (not nee3ded on flat structure
             file_tree['directories'][filename] = get_file_tree(filepath, os.path.join(parent_path, filename))
         else:
             file_stats = os.stat(filepath)
             file_tree['files'].append({
                 'name': filename,
-                'url': os.path.join(parent_path, filename),  # Modify as needed
-                #   'download_url': url_for('download_file', filename=os.path.join(parent_path, filename)),
+                # 'url': os.path.join(parent_path, filename), 
+                'download_url': url_for('download_file', filename=os.path.join(parent_path, 'download', filename)),
                 'size': file_stats.st_size,
                 'last_modified': datetime.datetime.fromtimestamp(file_stats.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
             })
