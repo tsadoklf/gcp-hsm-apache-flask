@@ -129,8 +129,8 @@ def parse_blobs(blobs):
 @app.route('/')
 def home():
     app.logger.info('Route / accessed')
-    # return redirect(url_for('browse_files'))
-    return redirect(url_for('list_files'))
+    return redirect(url_for('browse_files'))
+    # return redirect(url_for('list_files'))
 
 # -------------------------------------------
 @app.route('/login', methods=['GET', 'POST'])
@@ -154,31 +154,6 @@ def login():
 def logout():
     session.pop('username', None)  # Remove username from session
     return redirect(url_for('login'))
-
-# -------------------------------------------
-# -------------------------------------------
-@app.route('/list_files')
-def list_files():
-    folder_path = './../data'
-    file_list = os.listdir(folder_path)
-    list_html = '<ul>'
-    for file in file_list:
-        list_html += f'<li><a href="/download/{file}">{file}</a></li>'
-    list_html += '</ul>'
-    return list_html
-    
-# -------------------------------------------
-@app.route('/download/<path:filename>')
-def download_one_file(filename):
-    folder_path = './../data'
-    return send_from_directory(directory=folder_path, path=filename, as_attachment=True)
-# -------------------------------------------
-# @app.route('/download/<filename>')
-# def download_one_file(filename):
-#     file_path = os.path.join(folder_path, filename)
-#     return send_file(file_path, as_attachment=True)
-# -------------------------------------------
-# -------------------------------------------
 
 # -------------------------------------------
 @app.route('/browse')
@@ -250,8 +225,10 @@ def get_file_tree(directory, parent_path=''):
             file_stats = os.stat(filepath)
             file_tree['files'].append({
                 'name': filename,
-                'url': os.path.join(parent_path, filename), 
-                'download_url': url_for('download_file', filename=os.path.join(parent_path, 'download', filename)),
+                # 'url': os.path.join(parent_path, filename), 
+                # 'download_url': url_for('download_file', filename=os.path.join(parent_path, 'download', filename)),
+                'download_url': url_for('/download/', filename=os.path.join(parent_path, filename)),
+                
                 'size': file_stats.st_size,
                 'last_modified': datetime.datetime.fromtimestamp(file_stats.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
             })
@@ -262,6 +239,31 @@ def get_file_tree(directory, parent_path=''):
 def download_file(filename):
     directory = './../data'
     return send_from_directory(directory, filename, as_attachment=True)
+
+# -------------------------------------------
+# -------------------------------------------
+@app.route('/list_files')
+def list_files():
+    folder_path = './../data'
+    file_list = os.listdir(folder_path)
+    list_html += '<h1>Resec AV Files updates</h1>'
+    list_html += '<ul>'
+    for file in file_list:
+        list_html += f'<li><a href="/download/{file}">{file}</a></li>'
+    list_html += '</ul>'
+    return list_html
+    
+# -------------------------------------------
+@app.route('/download/<path:filename>')
+def download_one_file(filename):
+    folder_path = './../data'
+    return send_from_directory(directory=folder_path, path=filename, as_attachment=True)
+# -------------------------------------------
+# -------------------------------------------
+
+
+
+
 
 if __name__ == '__main__':
   
