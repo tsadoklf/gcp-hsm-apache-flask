@@ -10,6 +10,7 @@ import datetime
 
 # --- Amir
 from flask import Flask, send_file
+from flask import send_from_directory
 
 # Load environment variables from .env file
 load_dotenv()
@@ -165,12 +166,16 @@ def list_files():
         list_html += f'<li><a href="/download/{file}">{file}</a></li>'
     list_html += '</ul>'
     return list_html
-
+    
 # -------------------------------------------
-@app.route('/download/<filename>')
+@app.route('/download/<path:filename>')
 def download_one_file(filename):
-    file_path = os.path.join(folder_path, filename)
-    return send_file(file_path, as_attachment=True)
+    return send_from_directory(directory=folder_path, path=filename, as_attachment=True)
+# -------------------------------------------
+# @app.route('/download/<filename>')
+# def download_one_file(filename):
+#     file_path = os.path.join(folder_path, filename)
+#     return send_file(file_path, as_attachment=True)
 # -------------------------------------------
 # -------------------------------------------
 
