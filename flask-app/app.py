@@ -301,7 +301,7 @@ def get_file_tree(directory, parent_path=''):
                 'name': filename,
                 'url': 'na',
                 'size': 'na',
-                'last_modified': datetime.datetime.fromtimestamp(file_stats.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
+                'last_modified': 'na'
             })
             
 
