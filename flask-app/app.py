@@ -297,10 +297,7 @@ def get_file_tree(directory, parent_path=''):
             # drill down into sub folders, disabled for now, we only want to show the root
             # file_tree['directories'][filename] = get_file_tree(filepath, os.path.join(parent_path, filename))
             
-            file_tree['directories'].append({
-                'name': filename,
-                'path': os.path.join(parent_path, filename)
-            })
+            file_tree['directories'][filename] = get_file_tree(filepath, os.path.join(parent_path, 'xxxxx'))
 
         else:
             
