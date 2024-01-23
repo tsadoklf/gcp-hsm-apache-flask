@@ -159,7 +159,7 @@ def sync_files():
         # Dump the retrieved URL page content to the screen
         if debug:
             url_page_dump = f'Retrieved URL page content: {html_content}<br>'
-            else
+        else:
             url_page_dump = ''
 
         # Find all HREF links
@@ -168,7 +168,7 @@ def sync_files():
         # Dump the parsed soup result to the screen
         if debug:
             soup_dump = f'Parsed soup result: {all_links}<br>'
-            else
+        else:
             soup_dump = ''
         
         # Create a local folder to save the downloaded files
@@ -185,7 +185,7 @@ def sync_files():
             # Dump the list
             if debug:
                 url_page_dump += f'URLs: {file_url}<br>'
-                else
+            else:
                 url_page_dump = ''
             
             file_name = file_url.split('/')[-1]
