@@ -297,11 +297,11 @@ def get_file_tree(directory, parent_path=''):
             # file_tree['directories'][filename] = get_file_tree(filepath, os.path.join(parent_path, filename))
 
             # show folder as is, instead
-            file_tree['files'].append({
+            file_tree['directories'].append({
                 'name': filename,
-                'url': 'na',
-                'size': 'na',
-                'last_modified': 'na'
+                'url': '', # to be replaced with a link to the folder, to be protected with login
+                'size': '',
+                'last_modified': ''
             })
             
 
