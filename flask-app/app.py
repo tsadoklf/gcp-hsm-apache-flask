@@ -146,10 +146,10 @@ def sync_files():
     url = 'https://update.resec.co'
     response = requests.get(url)
 
-    debug = false
+    debug = False
     # debug switch, used to show the results
     if 'debug' in request.args and request.args.get('debug') == '1':
-        debug = true
+        debug = True
     
     # Check if the request was successful
     if response.status_code == 200:
