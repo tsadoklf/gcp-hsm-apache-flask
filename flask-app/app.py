@@ -151,6 +151,12 @@ def sync_files():
         html_content = response.content
         soup = BeautifulSoup(html_content, 'html.parser')
 
+        # Dump the retrieved URL page content to the screen
+        url_page_dump = f'Retrieved URL page content: {html_content}<br>'
+
+        # Dump the parsed soup result to the screen
+        soup_dump = f'Parsed soup result: {soup.prettify()}<br>'
+        
         # Find all HREF links
         all_links = soup.find_all('a', href=True)
 
@@ -161,7 +167,7 @@ def sync_files():
 
         # Download all the files into the local folder
         for link in all_links:
-            file_url = link['href']
+            file_url = url + '/download/' + link['href']
             file_name = file_url.split('/')[-1]
             file_path = os.path.join(local_folder, file_name)
 
@@ -172,9 +178,9 @@ def sync_files():
             with open(file_path, 'wb') as file:
                 file.write(file_response.content)
 
-        return 'Files downloaded successfully!'
+        return url_page_dump + soup_dump + 'Files downloaded successfully!'
     else:
-        return 'Failed to retrieve web page.'
+        return url_page_dump + soup_dump + 'Failed to retrieve web page.'
 # =============================================
 
 
