@@ -278,7 +278,7 @@ def browse():
 # -------------------------------------------
 @app.route('/browse_files')
 def browse_files():
-    # Replace 'your_directory_path' with the path of your directory
+    # path of your directory
     directory = './../data'
     file_tree = get_file_tree(directory)
 
@@ -292,20 +292,15 @@ def get_file_tree(directory, parent_path=''):
     for filename in os.listdir(directory):
         filepath = os.path.join(directory, filename)
         if os.path.isdir(filepath):
-            # display folders (not needed on flat structure
+            # display folders (not needed on flat structure)
             # drill down into sub folders, disabled for now, we only want to show the root
             # file_tree['directories'][filename] = get_file_tree(filepath, os.path.join(parent_path, filename))
 
             # show folder as is, instead
-            file_tree['directories'].append({
-                'name': filename,
-                'url': '', # to be replaced with a link to the folder, to be protected with login
-                'size': '',
-                'last_modified': ''
-            })
+            file_tree['directories'][filename] = filename
             
-
         else:
+            
             file_stats = os.stat(filepath)
             file_tree['files'].append({
                 'name': filename,
