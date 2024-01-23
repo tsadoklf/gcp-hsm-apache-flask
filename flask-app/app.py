@@ -288,10 +288,6 @@ def browse_files():
 
 # -------------------------------------------
 
-
-        if os.path.isdir(filepath):
-
-
 def get_file_tree(directory, parent_path=''):
     file_tree = {'files': [], 'directories': {}}
     for filename in os.listdir(directory):
