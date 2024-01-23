@@ -152,25 +152,28 @@ def sync_files():
         soup = BeautifulSoup(html_content, 'html.parser')
 
         # Dump the retrieved URL page content to the screen
+        # Debug ????????????????????????????????????????
         url_page_dump = f'Retrieved URL page content: {html_content}<br>'
 
         # Find all HREF links
         all_links = soup.find_all('a', href=True)
 
         # Dump the parsed soup result to the screen
+        # Debug ????????????????????????????????????????
         soup_dump = f'Parsed soup result: {all_links}<br>'
         
         # Create a local folder to save the downloaded files
-        local_folder = './../data/synced'
+        local_folder = './../data/'
         if not os.path.exists(local_folder):
             os.makedirs(local_folder)
 
         # Download all the files into the local folder
         url_page_dump = f'List of files<br>'
         for link in all_links:
-            file_url = url + '/' + link['href']
+            file_url = url + link['href']
 
             # Dump the list
+            # Debug ????????????????????????????????????????
             url_page_dump += f'URLs: {file_url}<br>'
             
             file_name = file_url.split('/')[-1]
@@ -277,8 +280,18 @@ def get_file_tree(directory, parent_path=''):
     for filename in os.listdir(directory):
         filepath = os.path.join(directory, filename)
         if os.path.isdir(filepath):
-            # display folders (not nee3ded on flat structure
-            file_tree['directories'][filename] = get_file_tree(filepath, os.path.join(parent_path, filename))
+            # display folders (not needed on flat structure
+            # drill down into sub folders, disabled for now, we only want to show the root
+            # file_tree['directories'][filename] = get_file_tree(filepath, os.path.join(parent_path, filename))
+            # show folder as is, instead
+            file_tree['directories'][filename].append({
+                'name': filename,
+                'url': 'na' # os.path.join("/download/", parent_path, filename), 
+                'size': 'na',
+                'last_modified': datetime.datetime.fromtimestamp(file_stats.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
+            })
+            
+            # file_tree['directories'][filename] = get_file_tree(filepath, os.path.join(parent_path, filename))
         else:
             file_stats = os.stat(filepath)
             file_tree['files'].append({
