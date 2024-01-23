@@ -286,7 +286,7 @@ def get_file_tree(directory, parent_path=''):
             # show folder as is, instead
             file_tree['directories'][filename].append({
                 'name': filename,
-                'url': 'na' # os.path.join("/download/", parent_path, filename), 
+                'url': 'na', # os.path.join("/download/", parent_path, filename), 
                 'size': 'na',
                 'last_modified': datetime.datetime.fromtimestamp(file_stats.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
             })
