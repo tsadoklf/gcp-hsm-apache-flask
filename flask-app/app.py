@@ -166,12 +166,13 @@ def sync_files():
             os.makedirs(local_folder)
 
         # Download all the files into the local folder
+        url_page_dump = f'List of files<br>'
         for link in all_links:
+            file_url = url + '/' + link['href']
 
             # Dump the list
-            url_page_dump += f'URLs: {link['href']}<br>'
+            url_page_dump += f'URLs: {file_url{<br>'
             
-            file_url = url + '/' + link['href']
             file_name = file_url.split('/')[-1]
             file_path = os.path.join(local_folder, file_name)
 
