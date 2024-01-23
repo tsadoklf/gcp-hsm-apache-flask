@@ -158,7 +158,7 @@ def sync_files():
         all_links = soup.find_all('a', href=True)
 
         # Dump the parsed soup result to the screen
-        soup_dump = f'Parsed soup result: {all_links.prettify()}<br>'
+        soup_dump = f'Parsed soup result: {all_links}<br>'
         
         # Create a local folder to save the downloaded files
         local_folder = './../data/synced'
