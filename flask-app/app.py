@@ -295,15 +295,16 @@ def get_file_tree(directory, parent_path=''):
             # display folders (not needed on flat structure
             # drill down into sub folders, disabled for now, we only want to show the root
             # file_tree['directories'][filename] = get_file_tree(filepath, os.path.join(parent_path, filename))
+
             # show folder as is, instead
-            file_tree['directories'][filename].append({
+            file_tree['files'].append({
                 'name': filename,
-                'url': 'na', # os.path.join("/download/", parent_path, filename), 
+                'url': 'na',
                 'size': 'na',
                 'last_modified': datetime.datetime.fromtimestamp(file_stats.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
             })
             
-            # file_tree['directories'][filename] = get_file_tree(filepath, os.path.join(parent_path, filename))
+
         else:
             file_stats = os.stat(filepath)
             file_tree['files'].append({
