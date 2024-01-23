@@ -29,44 +29,6 @@ users = {
     "user2": "password2"
 }
 
-# =============================================
-@app.route('/sync')
-def sync_files():
-    # Send a GET request to the remote web page
-    url = 'https://update.resec.co'
-    response = requests.get(url)
-
-    # Check if the request was successful
-    if response.status_code == 200:
-        html_content = response.content
-        soup = BeautifulSoup(html_content, 'html.parser')
-
-        # Find all HREF links
-        all_links = soup.find_all('a', href=True)
-
-        # Create a local folder to save the downloaded files
-        local_folder = ''./../data/synced'
-        if not os.path.exists(local_folder):
-            os.makedirs(local_folder)
-
-        # Download all the files into the local folder
-        for link in all_links:
-            file_url = link['href']
-            file_name = file_url.split('/')[-1]
-            file_path = os.path.join(local_folder, file_name)
-
-            # Send a GET request to download the file
-            file_response = requests.get(file_url)
-
-            # Save the file to the local folder
-            with open(file_path, 'wb') as file:
-                file.write(file_response.content)
-
-        return 'Files downloaded successfully!'
-    else:
-        return 'Failed to retrieve web page.'
-# =============================================
-
 # -------------------------------------------
 def set_logging():
 
@@ -174,6 +136,48 @@ def home():
     app.logger.info('Route / accessed')
     return redirect(url_for('browse_files'))
     # return redirect(url_for('list_files'))
+
+
+
+# =============================================
+@app.route('/sync')
+def sync_files():
+    # Send a GET request to the remote web page
+    url = 'https://update.resec.co'
+    response = requests.get(url)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        html_content = response.content
+        soup = BeautifulSoup(html_content, 'html.parser')
+
+        # Find all HREF links
+        all_links = soup.find_all('a', href=True)
+
+        # Create a local folder to save the downloaded files
+        local_folder = './../data/synced'
+        if not os.path.exists(local_folder):
+            os.makedirs(local_folder)
+
+        # Download all the files into the local folder
+        for link in all_links:
+            file_url = link['href']
+            file_name = file_url.split('/')[-1]
+            file_path = os.path.join(local_folder, file_name)
+
+            # Send a GET request to download the file
+            file_response = requests.get(file_url)
+
+            # Save the file to the local folder
+            with open(file_path, 'wb') as file:
+                file.write(file_response.content)
+
+        return 'Files downloaded successfully!'
+    else:
+        return 'Failed to retrieve web page.'
+# =============================================
+
+
 
 # -------------------------------------------
 @app.route('/login', methods=['GET', 'POST'])
