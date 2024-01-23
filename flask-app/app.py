@@ -287,6 +287,11 @@ def browse_files():
     return render_template('browse_files.html', files=file_tree)
 
 # -------------------------------------------
+
+
+        if os.path.isdir(filepath):
+
+
 def get_file_tree(directory, parent_path=''):
     file_tree = {'files': [], 'directories': {}}
     for filename in os.listdir(directory):
@@ -295,10 +300,12 @@ def get_file_tree(directory, parent_path=''):
             # display folders (not needed on flat structure)
             # drill down into sub folders, disabled for now, we only want to show the root
             # file_tree['directories'][filename] = get_file_tree(filepath, os.path.join(parent_path, filename))
-
-            # show folder as is, instead
-            file_tree['directories'][filename] = filename
             
+            file_tree['directories'].append({
+                'name': filename,
+                'path': os.path.join(parent_path, filename)
+            })
+
         else:
             
             file_stats = os.stat(filepath)
