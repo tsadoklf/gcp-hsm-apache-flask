@@ -146,21 +146,30 @@ def sync_files():
     url = 'https://update.resec.co'
     response = requests.get(url)
 
+    debug = false
+    # debug switch, used to show the results
+    if 'debug' in request.args and request.args.get('debug') == '1':
+        debug = true
+    
     # Check if the request was successful
     if response.status_code == 200:
         html_content = response.content
         soup = BeautifulSoup(html_content, 'html.parser')
 
         # Dump the retrieved URL page content to the screen
-        # Debug ????????????????????????????????????????
-        url_page_dump = f'Retrieved URL page content: {html_content}<br>'
+        if debug:
+            url_page_dump = f'Retrieved URL page content: {html_content}<br>'
+            else
+            url_page_dump = ''
 
         # Find all HREF links
         all_links = soup.find_all('a', href=True)
 
         # Dump the parsed soup result to the screen
-        # Debug ????????????????????????????????????????
-        soup_dump = f'Parsed soup result: {all_links}<br>'
+        if debug:
+            soup_dump = f'Parsed soup result: {all_links}<br>'
+            else
+            soup_dump = ''
         
         # Create a local folder to save the downloaded files
         local_folder = './../data/'
@@ -169,12 +178,15 @@ def sync_files():
 
         # Download all the files into the local folder
         url_page_dump = f'List of files<br>'
+        
         for link in all_links:
             file_url = url + link['href']
 
             # Dump the list
-            # Debug ????????????????????????????????????????
-            url_page_dump += f'URLs: {file_url}<br>'
+            if debug:
+                url_page_dump += f'URLs: {file_url}<br>'
+                else
+                url_page_dump = ''
             
             file_name = file_url.split('/')[-1]
             file_path = os.path.join(local_folder, file_name)
