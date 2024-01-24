@@ -267,7 +267,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('username', None)  # Remove username from session
-    return redirect(url_for('login'))
+    return redirect(url_for('browse_files'))
 
 # -------------------------------------------
 @app.route('/browse')
