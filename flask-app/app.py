@@ -254,8 +254,13 @@ def login():
         if username in users and users[username] == password:
             # Store username in session
             session['username'] = username  
-            # return redirect(url_for('browse'))
             # return redirect(url_for('browse_files'))
+
+            # Create a local folder for the logged on user if it does not yet exists
+            local_folder = './../data/' + username
+            if not os.path.exists(local_folder):
+                os.makedirs(local_folder)
+            # go to user's private area
             return redirect(url_for('private_area'))
         else:
             return "Invalid credentials", 401
