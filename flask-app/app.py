@@ -240,20 +240,23 @@ def sync_files():
         return url_page_dump + soup_dump + url_page_dump + 'Failed to retrieve web page.'
 # =============================================
 
-
-
 # -------------------------------------------
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if is_user_logged_in():
+        return redirect(url_for('private_area'))
+        
     app.logger.info('Route /login accessed')
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
 
         if username in users and users[username] == password:
-            session['username'] = username  # Store username in session
+            # Store username in session
+            session['username'] = username  
             # return redirect(url_for('browse'))
-            return redirect(url_for('browse_files'))
+            # return redirect(url_for('browse_files'))
+            return redirect(url_for('private_area'))
         else:
             return "Invalid credentials", 401
 
@@ -271,7 +274,7 @@ def browse():
     app.logger.info('Route /browse accessed')
 
     # Ensure the user is logged in
-    if not is_user_logged_in():  # Replace with your actual login check
+    if not is_user_logged_in():
         logger.error("User not logged in")
         return redirect(url_for('login'))
 
@@ -328,7 +331,7 @@ def browse_files():
 def private_area():
 
     # Ensure the user is logged in
-    if not is_user_logged_in():  # Replace with your actual login check
+    if not is_user_logged_in():
         logger.error("User not logged in")
         return redirect(url_for('login'))
     
