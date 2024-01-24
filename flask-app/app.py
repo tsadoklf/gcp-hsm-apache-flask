@@ -46,9 +46,9 @@ def whitelist(ip_whitelist, domain_whitelist):
                 try:
                     host = socket.gethostbyaddr(client_ip)[0]
                     if host not in domain_whitelist:
-                        return jsonify({'error': 'Unauthorized'}), 403  # Return a 403 Forbidden status
+                        return jsonify({'error': host + 'Unauthorized'}), 403  # Return a 403 Forbidden status
                 except socket.herror:
-                    return jsonify({'error': 'Unauthorized'}), 403  # Return a 403 Forbidden status
+                    return jsonify({'error': host + 'Unauthorized'}), 403  # Return a 403 Forbidden status
 
             return func(*args, **kwargs)
         return wrapper
