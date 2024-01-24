@@ -57,15 +57,12 @@ def whitelist(ip_whitelist, domain_whitelist):
 # Define the set of allowed IP addresses
 #                AmirHome                       update.resec.co 
 allowed_ips = {'192.168.96.3', '192.168.112.3' '20.216.132.35'} 
+# I keep getting apache-server.app-network for host and 192.168.128.3, 192.168.112.3, for IP
+# because of the network container abstraction
 
 # Define the set of allowed domains
 allowed_domains = {'updates.resec.co'}
 # ##########################################################
-
-
-
-
-
 
 # -------------------------------------------
 def set_logging():
@@ -177,7 +174,7 @@ def home():
 
 # -------------------------------------------
 @app.route('/sync')
-@whitelist(allowed_ips, allowed_domains)
+# ### @whitelist(allowed_ips, allowed_domains)
 def sync_files():
     # Send a GET request to the remote web page
     url = 'https://update.resec.co'
