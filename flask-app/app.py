@@ -336,7 +336,7 @@ def private_area():
     
     # path of your directory
     ########### ToDo: replace to user with username according to logon
-    directory = './../data/'
+    directory = './../data/' + session['username']
     file_tree = get_file_tree(directory)
 
     # print("===========================================")
