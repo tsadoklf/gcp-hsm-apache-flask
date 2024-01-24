@@ -102,7 +102,7 @@ def set_logging():
 
 # -------------------------------------------
 def is_user_logged_in():
-    'username' in session
+    return 'username' in session
 
 # -------------------------------------------
 def parse_blobs(blobs):       
@@ -332,12 +332,11 @@ def private_area():
 
     # Ensure the user is logged in
     if not is_user_logged_in():
-        logger.error("User not logged in")
         return redirect(url_for('login'))
     
     # path of your directory
-    ########### ToDo: replace the user with username according to logon
-    directory = './../data/user'
+    ########### ToDo: replace to user with username according to logon
+    directory = './../data/'
     file_tree = get_file_tree(directory)
 
     # print("===========================================")
