@@ -31,7 +31,10 @@ app.secret_key = 'tsadok_secret_key'  # Set a secret key for session management
 # Mock user data for simplicity
 users = {
     "user1": "password1",
-    "user2": "password2"
+    "user2": "password2",
+    "amir" : "1111",
+    "yaar" : "1111",
+    "oren" : '1111"
 }
 
 # ##########################################################
@@ -321,7 +324,24 @@ def browse_files():
     return render_template('browse_files.html', files=file_tree)
 
 # -------------------------------------------
+@app.route('/private')
+def private_area():
 
+    # Ensure the user is logged in
+    if not is_user_logged_in():  # Replace with your actual login check
+        logger.error("User not logged in")
+        return redirect(url_for('login'))
+    
+    # path of your directory
+    ########### ToDo: replace the user with username according to logon
+    directory = './../data/user'
+    file_tree = get_file_tree(directory)
+
+    # print("===========================================")
+    print(file_tree)
+    return render_template('browse_files.html', files=file_tree)
+
+# -------------------------------------------
 def get_file_tree(directory, parent_path=''):
     file_tree = {'files': [], 'directories': {}}
     for filename in os.listdir(directory):
@@ -373,10 +393,6 @@ def download_one_file(filename):
     return send_from_directory(directory=folder_path, path=filename, as_attachment=True)
 # -------------------------------------------
 # -------------------------------------------
-
-
-
-
 
 if __name__ == '__main__':
   
