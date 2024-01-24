@@ -256,10 +256,6 @@ def login():
             session['username'] = username  
             # return redirect(url_for('browse_files'))
 
-            # Create a local folder for the logged on user if it does not yet exists
-            local_folder = './../data/' + username
-            if not os.path.exists(local_folder):
-                os.makedirs(local_folder)
             # go to user's private area
             return redirect(url_for('private_area'))
         else:
@@ -339,8 +335,11 @@ def private_area():
     if not is_user_logged_in():
         return redirect(url_for('login'))
     
-    # path of your directory
-    ########### ToDo: replace to user with username according to logon
+    # Create a local folder for the logged on user if it does not yet exists
+    local_folder = './../data/' + session['username']
+    if not os.path.exists(local_folder):
+        os.makedirs(local_folder)
+    
     directory = './../data/' + session['username']
     file_tree = get_file_tree(directory)
 
