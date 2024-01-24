@@ -339,6 +339,11 @@ def private_area():
     local_folder = './../data/' + session['username']
     if not os.path.exists(local_folder):
         os.makedirs(local_folder)
+
+    # Write "hello user" content to a text file in the created folder
+    file_path = os.path.join(local_folder, session['username'] + '-ReadMe.txt')
+    with open(file_path, 'w') as file:
+        file.write('Dear ' + session['username'] + '. This folder will contain only files meant for you alone.')
     
     directory = './../data/' + session['username']
     file_tree = get_file_tree(directory)
