@@ -349,17 +349,20 @@ def private_area():
     return render_template('browse_files.html', files=file_tree)
 
 # -------------------------------------------
-def get_file_tree(directory, parent_path=''):
+def get_file_tree(directory, parent_path='', go_deep = False):
     file_tree = {'files': [], 'directories': {}}
     for filename in os.listdir(directory):
         filepath = os.path.join(directory, filename)
         if os.path.isdir(filepath):
             # display folders (not needed on flat structure)
             # drill down into sub folders, disabled for now, we only want to show the root
-            # file_tree['directories'][filename] = get_file_tree(filepath, os.path.join(parent_path, filename))
             
-            file_tree['directories'][filename] = get_file_tree(filepath, os.path.join(parent_path, 'xxxxx'))
-
+            if go_deep:
+                file_tree['directories'][filename] = get_file_tree(filepath, os.path.join(parent_path, filename, go_deep))
+            else:            
+                # we do not want to see sub folders
+                continue
+                
         else:
             
             file_stats = os.stat(filepath)
