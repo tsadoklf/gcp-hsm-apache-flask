@@ -55,7 +55,8 @@ def whitelist(ip_whitelist, domain_whitelist):
     return decorator
 
 # Define the set of allowed IP addresses
-allowed_ips = {'192.168.1.100', '192.168.1.101'}  # Example IP addresses
+#                AmirHome       update.resec.co 
+allowed_ips = {'192.168.96.3', '20.216.132.35'} 
 
 # Define the set of allowed domains
 allowed_domains = {'updates.resec.co'}
