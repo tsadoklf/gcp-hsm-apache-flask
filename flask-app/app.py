@@ -13,10 +13,15 @@ from flask import Flask, send_file
 from flask import send_from_directory
 
 # --- Amir - for sync process
-import requests
+# import requests
 from bs4 import BeautifulSoup
 
+# for white listsing of authorized callers of /sync method
+from functools import wraps
+from flask import jsonify
+import socket
 
+# -------------------------------------------
 # Load environment variables from .env file
 load_dotenv()
 
@@ -28,6 +33,38 @@ users = {
     "user1": "password1",
     "user2": "password2"
 }
+
+# ##########################################################
+# Define a custom decorator for IP and domain whitelisting
+def whitelist(ip_whitelist, domain_whitelist):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            client_ip = request.remote_addr
+
+            if client_ip not in ip_whitelist:
+                try:
+                    host = socket.gethostbyaddr(client_ip)[0]
+                    if host not in domain_whitelist:
+                        return jsonify({'error': 'Unauthorized'}), 403  # Return a 403 Forbidden status
+                except socket.herror:
+                    return jsonify({'error': 'Unauthorized'}), 403  # Return a 403 Forbidden status
+
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+# Define the set of allowed IP addresses
+allowed_ips = {'192.168.1.100', '192.168.1.101'}  # Example IP addresses
+
+# Define the set of allowed domains
+allowed_domains = {'updates.resec.co'}
+# ##########################################################
+
+
+
+
+
 
 # -------------------------------------------
 def set_logging():
@@ -137,10 +174,9 @@ def home():
     return redirect(url_for('browse_files'))
     # return redirect(url_for('list_files'))
 
-
-
-# =============================================
+# -------------------------------------------
 @app.route('/sync')
+@whitelist(allowed_ips, allowed_domains)
 def sync_files():
     # Send a GET request to the remote web page
     url = 'https://update.resec.co'
