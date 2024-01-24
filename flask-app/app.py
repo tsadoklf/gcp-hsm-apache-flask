@@ -13,7 +13,7 @@ from flask import Flask, send_file
 from flask import send_from_directory
 
 # --- Amir - for sync process
-# import requests
+import requests
 from bs4 import BeautifulSoup
 
 # for white listsing of authorized callers of /sync method
