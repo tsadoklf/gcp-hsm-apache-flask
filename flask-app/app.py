@@ -43,6 +43,10 @@ users = {
     "oren" : "1111"
 }
 
+# this variable is used for the google analytics in the template file.
+# needed for google analytics
+current_username = 'Not Logged-in'
+
 # ##########################################################
 # Define a custom decorator for IP and domain whitelisting
 def whitelist(ip_whitelist, domain_whitelist):
@@ -194,9 +198,9 @@ def login():
 
         if username in users and users[username] == password:
             # Store username in session
-            session['username'] = username  
-            # return redirect(url_for('browse_files'))
-
+            session['username'] = username
+            # needed for google analytics
+            current_username = username
             # go to user's private area
             return redirect(url_for('private_area'))
         else:
@@ -207,7 +211,10 @@ def login():
 # -------------------------------------------
 @app.route('/logout')
 def logout():
-    session.pop('username', None)  # Remove username from session
+    # Remove username from session
+    session.pop('username', None)  
+    # needed for google analytics
+    current_username = 'Not Logged-in'
     return redirect(url_for('browse_files'))
 
 # -------------------------------------------
