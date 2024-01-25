@@ -42,10 +42,6 @@ users = {
     "oren" : "1111"
 }
 
-# this variable is used for the google analytics in the template file.
-# needed for google analytics
-current_username = 'Not Logged-in'
-
 # ##########################################################
 # Define a custom decorator for IP and domain whitelisting
 def whitelist(ip_whitelist, domain_whitelist):
@@ -181,6 +177,13 @@ def parse_blobs(blobs):
 @app.route('/')
 def home():
     app.logger.info('Route / accessed')
+
+    # this variable is used for the google analytics in the template file.
+    # needed for google analytics
+    current_username = request.form['username']
+    if not current_username:
+        current_username = 'Not Logged-in'
+    
     return redirect(url_for('browse_files'))
 
 # -------------------------------------------
