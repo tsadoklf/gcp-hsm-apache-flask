@@ -180,7 +180,7 @@ def home():
 
     # this variable is used for the google analytics in the template file.
     # needed for google analytics
-    current_username = request.form['username']
+    current_username = session['username']
     if not current_username:
         current_username = 'Not Logged-in'
     
