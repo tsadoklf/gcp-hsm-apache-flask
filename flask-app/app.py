@@ -184,10 +184,10 @@ def home():
     # this variable is used for the google analytics in the template file.
     # needed for google analytics
     try:
-        current_username = session['username']
+        global current_username = session['username']
     except KeyError:
         # if not current_username:
-        current_username = 'No Session'
+        global current_username = 'No Session'
         
     logger.info('Current user in home: ' + current_username)
     
@@ -208,7 +208,7 @@ def login():
             # Store username in session
             session['username'] = username
             # needed for google analytics
-            current_username = username
+            global current_username = username
             logger.info('Current user in login: ' + current_username)
             # go to user's private area
             return redirect(url_for('private_area'))
@@ -223,7 +223,7 @@ def logout():
     # Remove username from session
     session.pop('username', None)  
     # needed for google analytics
-    current_username = 'Logged-out'
+    global current_username = 'Logged-out'
     logger.info('Current user in logout: ' + current_username)
     return redirect(url_for('browse_files'))
 
