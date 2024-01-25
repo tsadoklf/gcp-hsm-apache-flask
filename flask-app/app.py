@@ -43,7 +43,7 @@ users = {
 }
 
 # used for analytics events
-current_username = 'Not Logged-in'
+current_username = 'No User'
 
 # ##########################################################
 # Define a custom decorator for IP and domain whitelisting
@@ -187,7 +187,7 @@ def home():
         current_username = session['username']
     except KeyError:
         # if not current_username:
-        current_username = 'Not Logged-in'
+        current_username = 'No Session'
     
     return redirect(url_for('browse_files'))
 
@@ -220,7 +220,7 @@ def logout():
     # Remove username from session
     session.pop('username', None)  
     # needed for google analytics
-    current_username = 'Not Logged-in'
+    current_username = 'Logged-out'
     return redirect(url_for('browse_files'))
 
 # -------------------------------------------
