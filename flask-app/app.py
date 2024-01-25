@@ -43,7 +43,7 @@ users = {
 }
 
 # used for analytics events
-current_username = 'No User'
+current_username = "No User"
 
 # ##########################################################
 # Define a custom decorator for IP and domain whitelisting
@@ -188,6 +188,8 @@ def home():
     except KeyError:
         # if not current_username:
         current_username = 'No Session'
+        
+    logger.info('Current user in home: ' + current_username)
     
     return redirect(url_for('browse_files'))
 
@@ -207,6 +209,7 @@ def login():
             session['username'] = username
             # needed for google analytics
             current_username = username
+            logger.info('Current user in login: ' + current_username)
             # go to user's private area
             return redirect(url_for('private_area'))
         else:
@@ -221,6 +224,7 @@ def logout():
     session.pop('username', None)  
     # needed for google analytics
     current_username = 'Logged-out'
+    logger.info('Current user in logout: ' + current_username)
     return redirect(url_for('browse_files'))
 
 # -------------------------------------------
@@ -303,6 +307,7 @@ def sync_files():
 def browse_files():
     # path of your directory
     directory = './../data'
+    logger.info('Current user in browse files: ' + current_username)
     file_tree = get_file_tree(directory)
 
     # print("===========================================")
@@ -338,6 +343,9 @@ def private_area():
 def get_file_tree(directory, parent_path='', go_deep = False):
     file_tree = {'files': [], 'directories': {}}
     files = sorted(os.listdir(directory))
+
+    logger.info('Current user in discovery: ' + current_username)
+    
     for filename in files:
         filepath = os.path.join(directory, filename)
         if os.path.isdir(filepath):
