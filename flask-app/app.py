@@ -45,7 +45,7 @@ users = {
 # used for analytics events
 current_username = "No User"
 
-# ##########################################################
+# -------------------------------------------
 # Define a custom decorator for IP and domain whitelisting
 def whitelist(ip_whitelist, domain_whitelist):
     def decorator(func):
@@ -73,7 +73,6 @@ allowed_ips = {'192.168.96.3', '192.168.112.3' '20.216.132.35'}
 
 # Define the set of allowed domains
 allowed_domains = {'updates.resec.co'}
-# ##########################################################
 
 # -------------------------------------------
 def set_logging():
@@ -180,14 +179,15 @@ def parse_blobs(blobs):
 @app.route('/')
 def home():
     app.logger.info('Route / accessed')
+    global current_username 
 
     # this variable is used for the google analytics in the template file.
     # needed for google analytics
     try:
-        global current_username = session['username']
+        current_username = session['username']
     except KeyError:
         # if not current_username:
-        global current_username = 'No Session'
+        current_username = 'No Session'
         
     logger.info('Current user in home: ' + current_username)
     
@@ -196,10 +196,13 @@ def home():
 # -------------------------------------------
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    app.logger.info('Route /login accessed')
+
     if is_user_logged_in():
         return redirect(url_for('private_area'))
-        
-    app.logger.info('Route /login accessed')
+    
+    global current_username         
+    
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -208,7 +211,7 @@ def login():
             # Store username in session
             session['username'] = username
             # needed for google analytics
-            global current_username = username
+            current_username = username
             logger.info('Current user in login: ' + current_username)
             # go to user's private area
             return redirect(url_for('private_area'))
@@ -220,10 +223,13 @@ def login():
 # -------------------------------------------
 @app.route('/logout')
 def logout():
+    global current_username 
+    app.logger.info('Route /logout accessed')
+    
     # Remove username from session
     session.pop('username', None)  
     # needed for google analytics
-    global current_username = 'Logged-out'
+    current_username = 'Logged-out'
     logger.info('Current user in logout: ' + current_username)
     return redirect(url_for('browse_files'))
 
@@ -231,6 +237,8 @@ def logout():
 @app.route('/sync')
 # ### @whitelist(allowed_ips, allowed_domains)
 def trigger_file_downloads():
+    app.logger.info('Route /sync accessed')
+    
     if 'debug' in request.args and request.args.get('debug') == '1':
         return jsonify({'message': 'Debug mode is active. Skipping file download.'})
     else:
@@ -240,6 +248,7 @@ def trigger_file_downloads():
 
 # -------------------------------------------
 def sync_files():
+    app.logger.info('Route /Sync file thread started')
     # Send a GET request to the remote web page
     url = 'https://update.resec.co'
     response = requests.get(url)
@@ -296,6 +305,7 @@ def sync_files():
             with open(file_path, 'wb') as file:
                 file.write(file_response.content)
 
+        app.logger.info('Route /Sync file thread ended')
         pass
 
     #        return url_page_dump + soup_dump + url_page_dump + 'Files downloaded successfully!'
@@ -305,6 +315,7 @@ def sync_files():
 # -------------------------------------------
 @app.route('/browse_files')
 def browse_files():
+    app.logger.info('Route /browse_files accessed')
     # path of your directory
     directory = './../data'
     logger.info('Current user in browse files: ' + current_username)
@@ -318,6 +329,8 @@ def browse_files():
 @app.route('/private')
 def private_area():
 
+    app.logger.info('Route /private accessed')
+    
     # Ensure the user is logged in
     if not is_user_logged_in():
         return redirect(url_for('login'))
@@ -341,6 +354,8 @@ def private_area():
 
 # -------------------------------------------
 def get_file_tree(directory, parent_path='', go_deep = False):
+    app.logger.info('Route /det_file_tree called')
+
     file_tree = {'files': [], 'directories': {}}
     files = sorted(os.listdir(directory))
 
@@ -384,14 +399,9 @@ def get_file_tree(directory, parent_path='', go_deep = False):
 # -------------------------------------------
 @app.route('/download/<path:filename>')
 def download_file(filename):
+    app.logger.info('Route /download accessed')
     directory = './../data'
     return send_from_directory(directory, filename, as_attachment=True)
-
-# -------------------------------------------
-@app.route('/download/<path:filename>')
-def download_one_file(filename):
-    folder_path = './../data'
-    return send_from_directory(directory=folder_path, path=filename, as_attachment=True)
 
 # -------------------------------------------
 @app.route('/browse')
