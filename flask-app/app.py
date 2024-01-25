@@ -176,6 +176,35 @@ def home():
     # return redirect(url_for('list_files'))
 
 # -------------------------------------------
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if is_user_logged_in():
+        return redirect(url_for('private_area'))
+        
+    app.logger.info('Route /login accessed')
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        if username in users and users[username] == password:
+            # Store username in session
+            session['username'] = username  
+            # return redirect(url_for('browse_files'))
+
+            # go to user's private area
+            return redirect(url_for('private_area'))
+        else:
+            return "Invalid credentials", 401
+
+    return render_template('login.html')
+
+# -------------------------------------------
+@app.route('/logout')
+def logout():
+    session.pop('username', None)  # Remove username from session
+    return redirect(url_for('browse_files'))
+
+# -------------------------------------------
 @app.route('/sync')
 # ### @whitelist(allowed_ips, allowed_domains)
 def sync_files():
@@ -238,83 +267,6 @@ def sync_files():
         return url_page_dump + soup_dump + url_page_dump + 'Files downloaded successfully!'
     else:
         return url_page_dump + soup_dump + url_page_dump + 'Failed to retrieve web page.'
-# =============================================
-
-# -------------------------------------------
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if is_user_logged_in():
-        return redirect(url_for('private_area'))
-        
-    app.logger.info('Route /login accessed')
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-
-        if username in users and users[username] == password:
-            # Store username in session
-            session['username'] = username  
-            # return redirect(url_for('browse_files'))
-
-            # go to user's private area
-            return redirect(url_for('private_area'))
-        else:
-            return "Invalid credentials", 401
-
-    return render_template('login.html')
-
-# -------------------------------------------
-@app.route('/logout')
-def logout():
-    session.pop('username', None)  # Remove username from session
-    return redirect(url_for('browse_files'))
-
-# -------------------------------------------
-@app.route('/browse')
-def browse():
-    app.logger.info('Route /browse accessed')
-
-    # Ensure the user is logged in
-    if not is_user_logged_in():
-        logger.error("User not logged in")
-        return redirect(url_for('login'))
-
-    key_file_path = os.getenv('STORAGE_SERVICE_ACCOUNT_PRIVATE_KEY')
-    if not os.path.exists(key_file_path):
-        logger.error("STORAGE_SERVICE_ACCOUNT_PRIVATE_KEY environment variable not set")
-        return "STORAGE_SERVICE_ACCOUNT_PRIVATE_KEY environment variable not set", 500
-
-    # Initialize Google Cloud Storage client using explicit credentials (instead of application default credentials)
-    client = storage.Client.from_service_account_json(key_file_path)
-
-    bucket_name = os.getenv('GCP_BUCKET_NAME')
-    if not bucket_name:
-        logger.error("GCP_BUCKET_NAME environment variable not set")
-        return "GCP_BUCKET_NAME environment variable not set", 500
-
-    bucket = client.get_bucket(bucket_name)  
-
-    blobs = bucket.list_blobs( include_trailing_delimiter=False)
-    for blob in blobs:
-        if blob.name.endswith('/'):
-            logger.info(f'{blob.name} is a directory')
-        else:
-            logger.info(f'{blob.name} is a file')
-
-    logger.info("===========================================")
-
-    # List files and directories in the bucket
-    # blobs = bucket.list_blobs()
-    # files = parse_blobs(blobs)
-    
-    files = [{
-        "name": blob.name,
-        "url": blob.generate_signed_url(expiration=timedelta(minutes=60))  # URL expires in 60 minutes
-    } for blob in blobs]
-
-    return render_template('browse.html', files=files)
-
-# ================================================================
 
 # -------------------------------------------
 @app.route('/browse_files')
@@ -372,8 +324,8 @@ def get_file_tree(directory, parent_path='', go_deep = False):
             file_stats = os.stat(filepath)
             file_tree['files'].append({
                 'name': filename,
-                'url': os.path.join("/download/", parent_path, filename), 
-                # 'download_url': url_for('download_file', filename=os.path.join(parent_path, 'download', filename)),
+                'url': os.path.join("/download/", directory, parent_path, filename), 
+                # 'url': os.path.join("/download/", parent_path, filename), 
                 # 'download_url': url_for('/download/', filename=os.path.join(parent_path, filename)),
                 
                 'size': file_stats.st_size,
@@ -405,9 +357,53 @@ def list_files():
 def download_one_file(filename):
     folder_path = './../data'
     return send_from_directory(directory=folder_path, path=filename, as_attachment=True)
-# -------------------------------------------
-# -------------------------------------------
 
+# -------------------------------------------
+@app.route('/browse')
+def browse():
+    app.logger.info('Route /browse accessed')
+
+    # Ensure the user is logged in
+    if not is_user_logged_in():
+        logger.error("User not logged in")
+        return redirect(url_for('login'))
+
+    key_file_path = os.getenv('STORAGE_SERVICE_ACCOUNT_PRIVATE_KEY')
+    if not os.path.exists(key_file_path):
+        logger.error("STORAGE_SERVICE_ACCOUNT_PRIVATE_KEY environment variable not set")
+        return "STORAGE_SERVICE_ACCOUNT_PRIVATE_KEY environment variable not set", 500
+
+    # Initialize Google Cloud Storage client using explicit credentials (instead of application default credentials)
+    client = storage.Client.from_service_account_json(key_file_path)
+
+    bucket_name = os.getenv('GCP_BUCKET_NAME')
+    if not bucket_name:
+        logger.error("GCP_BUCKET_NAME environment variable not set")
+        return "GCP_BUCKET_NAME environment variable not set", 500
+
+    bucket = client.get_bucket(bucket_name)  
+
+    blobs = bucket.list_blobs( include_trailing_delimiter=False)
+    for blob in blobs:
+        if blob.name.endswith('/'):
+            logger.info(f'{blob.name} is a directory')
+        else:
+            logger.info(f'{blob.name} is a file')
+
+    logger.info("===========================================")
+
+    # List files and directories in the bucket
+    # blobs = bucket.list_blobs()
+    # files = parse_blobs(blobs)
+    
+    files = [{
+        "name": blob.name,
+        "url": blob.generate_signed_url(expiration=timedelta(minutes=60))  # URL expires in 60 minutes
+    } for blob in blobs]
+
+    return render_template('browse.html', files=files)
+
+# -------------------------------------------
 if __name__ == '__main__':
   
     # Set up basic logging
