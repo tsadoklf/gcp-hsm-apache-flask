@@ -324,7 +324,8 @@ def private_area():
 # -------------------------------------------
 def get_file_tree(directory, parent_path='', go_deep = False):
     file_tree = {'files': [], 'directories': {}}
-    for filename in os.listdir(directory):
+    files = sorted(os.listdir(directory))
+    for filename in files:
         filepath = os.path.join(directory, filename)
         if os.path.isdir(filepath):
             # display folders (not needed on flat structure)
