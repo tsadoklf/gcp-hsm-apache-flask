@@ -8,6 +8,7 @@ import logging
 from collections import defaultdict
 import datetime
 
+
 # --- Amir
 from flask import Flask, send_file
 from flask import send_from_directory
@@ -20,6 +21,9 @@ from bs4 import BeautifulSoup
 from functools import wraps
 from flask import jsonify
 import socket
+
+# for returning 200 in sync and processing in the background
+import threading
 
 # -------------------------------------------
 # Load environment variables from .env file
@@ -207,6 +211,16 @@ def logout():
 # -------------------------------------------
 @app.route('/sync')
 # ### @whitelist(allowed_ips, allowed_domains)
+def trigger_file_downloads():
+    if 'debug' in request.args and request.args.get('debug') == '1':
+        return jsonify({'message': 'Debug mode is active. Skipping file download.'})
+    else:
+        # Start a new thread to download files asynchronously
+        download_thread = threading.Thread(target=sync_files)
+        download_thread.start()
+        return jsonify({'message': 'File download process started'})
+
+# -------------------------------------------
 def sync_files():
     # Send a GET request to the remote web page
     url = 'https://update.resec.co'
