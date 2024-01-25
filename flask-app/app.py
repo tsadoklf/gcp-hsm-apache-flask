@@ -320,11 +320,16 @@ def get_file_tree(directory, parent_path='', go_deep = False):
                 continue
                 
         else:
+
+            if 'data/' not in directory:
+                dowload_path = 'download/' + directory
+            else:
+                dowload_path = directory.replace('data/', 'download/')            
             
             file_stats = os.stat(filepath)
             file_tree['files'].append({
                 'name': filename,
-                'url': os.path.join(directory.replace('data/', 'download/'), parent_path, filename), 
+                'url': os.path.join(dowload_path, parent_path, filename), 
                 # 'url': os.path.join("/download/", directory, parent_path, filename), 
                 
                 # 'url': os.path.join("/download/", parent_path, filename), 
