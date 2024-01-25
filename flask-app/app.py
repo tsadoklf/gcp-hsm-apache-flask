@@ -322,7 +322,7 @@ def get_file_tree(directory, parent_path='', go_deep = False):
         else:
 
             if 'data/' not in directory:
-                dowload_path = 'download/' + directory
+                dowload_path = '' # 'download/' + directory
             else:
                 dowload_path = directory.replace('data/', 'download/')            
             
