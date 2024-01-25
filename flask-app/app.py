@@ -184,7 +184,7 @@ def home():
     # this variable is used for the google analytics in the template file.
     # needed for google analytics
     try:
-        current_username = something['username']
+        current_username = session['username']
     except KeyError:
         # if not current_username:
         current_username = 'Not Logged-in'
