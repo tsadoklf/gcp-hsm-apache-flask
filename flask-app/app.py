@@ -8,7 +8,6 @@ import logging
 from collections import defaultdict
 import datetime
 
-
 # --- Amir
 from flask import Flask, send_file
 from flask import send_from_directory
@@ -183,7 +182,6 @@ def parse_blobs(blobs):
 def home():
     app.logger.info('Route / accessed')
     return redirect(url_for('browse_files'))
-    # return redirect(url_for('list_files'))
 
 # -------------------------------------------
 @app.route('/login', methods=['GET', 'POST'])
@@ -372,19 +370,6 @@ def download_file(filename):
     directory = './../data'
     return send_from_directory(directory, filename, as_attachment=True)
 
-# -------------------------------------------
-# -------------------------------------------
-@app.route('/list_files')
-def list_files():
-    folder_path = './../data'
-    file_list = os.listdir(folder_path)
-    list_html += '<h1>Resec AV Files updates</h1>'
-    list_html += '<ul>'
-    for file in file_list:
-        list_html += f'<li><a href="/download/{file}">{file}</a></li>'
-    list_html += '</ul>'
-    return list_html
-    
 # -------------------------------------------
 @app.route('/download/<path:filename>')
 def download_one_file(filename):
