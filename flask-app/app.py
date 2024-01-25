@@ -24,12 +24,14 @@ import socket
 
 # for returning 200 in sync and processing in the background
 import threading
+from flask_executor import Executor
 
 # -------------------------------------------
 # Load environment variables from .env file
 load_dotenv()
 
 app = Flask(__name__)
+executor = Executor(app)
 app.secret_key = 'tsadok_secret_key'  # Set a secret key for session management
 
 # Mock user data for simplicity
@@ -215,9 +217,8 @@ def trigger_file_downloads():
     if 'debug' in request.args and request.args.get('debug') == '1':
         return jsonify({'message': 'Debug mode is active. Skipping file download.'})
     else:
-        # Start a new thread to download files asynchronously
-        download_thread = threading.Thread(target=sync_files)
-        download_thread.start()
+        # Run the download_files_async function asynchronously
+        executor.submit_stored(download_files_async)  
         return jsonify({'message': 'File download process started'})
 
 # -------------------------------------------
@@ -278,9 +279,11 @@ def sync_files():
             with open(file_path, 'wb') as file:
                 file.write(file_response.content)
 
-        return url_page_dump + soup_dump + url_page_dump + 'Files downloaded successfully!'
-    else:
-        return url_page_dump + soup_dump + url_page_dump + 'Failed to retrieve web page.'
+        pass
+
+    #        return url_page_dump + soup_dump + url_page_dump + 'Files downloaded successfully!'
+    #    else:
+    #        return url_page_dump + soup_dump + url_page_dump + 'Failed to retrieve web page.'
 
 # -------------------------------------------
 @app.route('/browse_files')
