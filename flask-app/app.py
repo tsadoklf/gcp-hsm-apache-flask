@@ -218,7 +218,7 @@ def trigger_file_downloads():
         return jsonify({'message': 'Debug mode is active. Skipping file download.'})
     else:
         # Run the download_files_async function asynchronously
-        executor.submit_stored(download_files_async)  
+        executor.submit_stored(sync_files)  
         return jsonify({'message': 'File download process started'})
 
 # -------------------------------------------
