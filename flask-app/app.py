@@ -42,6 +42,9 @@ users = {
     "oren" : "1111"
 }
 
+# used for analytics events
+current_username = 'Not Logged-in'
+
 # ##########################################################
 # Define a custom decorator for IP and domain whitelisting
 def whitelist(ip_whitelist, domain_whitelist):
