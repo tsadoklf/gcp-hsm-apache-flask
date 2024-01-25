@@ -30,7 +30,7 @@
     
 <body>
     <!-- Macro Definition -->
-    {% macro render_directory(directory, content) %}
+    {% macro render_directory(directory, content, title) %}
         {% if directory != 'Root' %}
             <tr>
                 <td colspan="3"><i class="bi bi-folder-fill"></i> {{ directory }}</td>
@@ -57,7 +57,7 @@
             <div class="col-12">
 
                 <table style="width: 100%;"><tbody><tr>
-                    <td><h1 class="text-start mt-0 display-3">Resec AV Updates</h1></td>
+                    <td><h1 class="text-start mt-0 display-3">{{ title }}</h1></td>
                     <td style="text-align: right;"><a href="/">Home</a></td>
                     <td style="text-align: right;"><a href="/logout">Logout</a></td>
                     <td style="text-align: right;"><a href="/private">Private area</a></td>
