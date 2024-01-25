@@ -352,6 +352,7 @@ def get_file_tree(directory, parent_path='', go_deep = False):
             
             file_stats = os.stat(filepath)
             file_tree['files'].append({
+                'user': current_username,
                 'name': filename,
                 'url': os.path.join(dowload_path, parent_path, filename), 
                 # 'url': os.path.join("/download/", directory, parent_path, filename), 
