@@ -321,10 +321,11 @@ def get_file_tree(directory, parent_path='', go_deep = False):
                 
         else:
 
-            if 'data/' not in directory:
-                dowload_path = '' # 'download/' + directory
-            else:
+            # canonize all sub folder links to direct to the download route
+            if 'data/' in directory:
                 dowload_path = directory.replace('data/', 'download/')            
+            else:
+                dowload_path = 'download/'
             
             file_stats = os.stat(filepath)
             file_tree['files'].append({
