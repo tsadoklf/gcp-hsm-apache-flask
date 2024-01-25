@@ -322,8 +322,6 @@ def get_file_tree(directory, parent_path='', go_deep = False):
         else:
             
             file_stats = os.stat(filepath)
-
-            new_path = parsed_url.path.replace('/data/', '/download/', 1)            
             file_tree['files'].append({
                 'name': filename,
                 'url': os.path.join(directory.replace('data/', 'download/'), parent_path, filename), 
