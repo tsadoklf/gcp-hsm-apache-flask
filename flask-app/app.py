@@ -183,8 +183,10 @@ def home():
 
     # this variable is used for the google analytics in the template file.
     # needed for google analytics
-    current_username = session['username']
-    if not current_username:
+    try:
+        current_username = something['username']
+    except KeyError:
+        # if not current_username:
         current_username = 'Not Logged-in'
     
     return redirect(url_for('browse_files'))
