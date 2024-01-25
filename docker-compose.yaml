@@ -22,6 +22,8 @@ services:
       - "5000"
     networks:
       - app-network
+    depends_on:
+      - apache-server
 
   apache-server:
     container_name: apache-server
@@ -30,16 +32,25 @@ services:
       context: ./apache-server
       dockerfile: Dockerfile
     # hostname: localhost
+    entrypoint: /bin/bash -c "ls -l /usr/local/bin/ && chmod +x /usr/local/bin/entrypoint.sh && /usr/local/bin/entrypoint.sh"
     ports:
       - "80:80"
       - "443:443"
-    depends_on:
-      - flask-app
+    # depends_on:
+    #   - flask-app
     volumes:
       - ${PWD}/.credentials/kms-sa-private-key.json:/app/secrets/kms-sa-private-key.json
       - ${PWD}/.ssl:/etc/apache2/ssl
       - ${PWD}/.log/apache2:/var/log/apache2
       - ${PWD}/.log/letsencrypt:/var/log/letsencrypt/
+      - ${PWD}/.log/kmsp11:/var/log/kmsp11
+      - ${PWD}/apache-server:/usr/local/bin/
+      - ${PWD}/apache-server/config/apache/pkcs11-config.yaml:/usr/lib/x86_64-linux-gnu/engines-1.1/pkcs11-config.yaml
+      
+      
+      # - ${PWD}/apache-server/config/apache2/mirror:/etc/apache2
+      # - ${PWD}/apache-server/config/apache2/sites-available:/etc/apache2/sites-available
+      
     env_file:
       - ./apache-server/.env
     networks:

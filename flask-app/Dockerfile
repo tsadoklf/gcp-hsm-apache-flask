@@ -15,9 +15,8 @@ RUN pip install --no-cache-dir -r requirements.txt && \
     pip install --upgrade flask && \
     pip install --upgrade jinja2 && \
     pip install --upgrade pip && \
-    pip install --upgrade setuptools \
-    pip install requests beautifulsoup4 \
-    pip install flask_executor
+    pip install --upgrade setuptools && \
+    pip install requests beautifulsoup4 flask_executor 
 
 # Copy the application code into the container
 COPY . .

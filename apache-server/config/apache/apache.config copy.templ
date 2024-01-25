@@ -1,0 +1,45 @@
+<VirtualHost *:443>
+    ServerAdmin webmaster@localhost
+    ServerName {{SERVER_NAME}}
+   
+    # Set the DocumentRoot to a directory inside the user's home directory
+    DocumentRoot /var/www/html
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+    SSLEngine on
+    SSLCertificateFile {{CERT_FILE}}
+    SSLCertificateKeyFile {{CERT_KEY_FILE}}
+
+    <IfDefine USE_CHAIN_FILE>
+        SSLCertificateChainFile {{CERT_CHAIN_FILE}}
+    </IfDefine>
+
+    # added by Amir to attempt downloading files instead of showing them
+    <Location /data>
+        SetEnvIf Request_URI "^.*/([^/]*)$" FILENAME=$1
+        Header set "Content-disposition" "attachment; filename=%{FILENAME}e"
+        UnsetEnv FILENAME
+    </Location>
+
+    # Additional SSL configuration can be added here.
+    
+    # Reverse proxy configuration
+    ProxyPreserveHost On
+    ProxyPass / {{FLASK_APP}}
+    ProxyPassReverse / {{FLASK_APP}}
+
+</VirtualHost>
+
+# <VirtualHost *:80>
+#     ServerName {{SERVER_NAME}}
+#     DocumentRoot /var/www/html
+#     Alias /.well-known/acme-challenge/ /var/www/html/.well-known/acme-challenge/
+#     <Directory "/var/www/html/.well-known/acme-challenge/">
+#         Options None
+#         AllowOverride None
+#         ForceType text/plain
+#         Require all granted
+#     </Directory>
+# </VirtualHost>
+

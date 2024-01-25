@@ -1,0 +1,8 @@
+Log file created at: 2024/11/04 13:47:59
+Running on machine: a22fcd197aa4
+Log line format: [IWEF]yyyymmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I20241104 13:47:59.903465    87 object_loader.cc:61] INFO: version projects/resec-cloud/locations/us-central1/keyRings/resec-hsm-ring/cryptoKeys/hsm-sign/cryptoKeyVersions/1 is not loadable due to unsupported state DESTROYED
+I20241104 13:47:59.917868    87 object_loader.cc:61] INFO: version projects/resec-cloud/locations/us-central1/keyRings/resec-hsm-ring/cryptoKeys/hsm-sign/cryptoKeyVersions/2 is not loadable due to unsupported state DESTROYED
+I20241104 13:48:00.112458    87 object_loader.cc:61] INFO: version projects/resec-cloud/locations/us-central1/keyRings/resec-hsm-ring/cryptoKeys/resec-hsm-key/cryptoKeyVersions/1 is not loadable due to unsupported state DESTROYED
+I20241104 13:48:00.112533    87 object_loader.cc:61] INFO: version projects/resec-cloud/locations/us-central1/keyRings/resec-hsm-ring/cryptoKeys/resec-hsm-key/cryptoKeyVersions/2 is not loadable due to unsupported state DESTROYED
+I20241104 13:48:00.112551    87 object_loader.cc:61] INFO: version projects/resec-cloud/locations/us-central1/keyRings/resec-hsm-ring/cryptoKeys/resec-hsm-key/cryptoKeyVersions/3 is not loadable due to unsupported state DESTROYED

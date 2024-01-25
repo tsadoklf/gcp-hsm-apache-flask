@@ -323,6 +323,7 @@ def browse_files():
 # -------------------------------------------
 @app.route('/private')
 def private_area():
+    global current_username 
 
     app.logger.info('Route /private accessed')
     
@@ -345,7 +346,7 @@ def private_area():
 
     # print("===========================================")
     print(file_tree)
-    return render_template('browse_files.html', files=file_tree, title='Resec Private Area')
+    return render_template('browse_files.html', files=file_tree, title='Resec Private Area (' + current_username + ')')
 
 # -------------------------------------------
 def get_file_tree(directory, parent_path='', go_deep = False):

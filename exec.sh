@@ -9,16 +9,24 @@ function usage(){
 function cleanup(){
     echo ""
     echo "Cleaning up ..."
-    rm -rf ./log
-    rm -rf ./ssl
+
+    # copy .log directory files to .log.bak if exists
+    [ -d .log ] && cp -r .log .log.bak
+    rm -rf .log
+    # rm -rf ./ssl
 }
 
 COMMAND="$1"
 case "$COMMAND" in
+    "build")
+        docker compose -f docker-compose.yaml build --no-cache
+        # docker compose -f docker-compose.yaml build 
+        ;;
     "up")
         cleanup
 
-        docker compose -f docker-compose.yaml up --build --remove-orphans
+        # docker compose -f docker-compose.yaml build --no-cache
+        docker compose -f docker-compose.yaml up --remove-orphans
         ;;
     "up-bg")
         cleanup
