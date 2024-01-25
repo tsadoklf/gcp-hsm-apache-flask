@@ -19,11 +19,11 @@
 </script>
 
 <script>
-  function trackFileDownload(fileName) {
+  function trackFileDownload(fileName, user) {
     gtag('event', 'file_download', {
       'event_category': 'File Downloads',
       'event_label': fileName,
-      'username': '{{ current_username }}'
+      'username': user
     });
   }
 </script>    
@@ -41,7 +41,7 @@
                 <td>
                     <i class="bi bi-file-earmark-fill"></i>
                     <!-- <a href="{{ file.url }}">{{ file.name }}</a> -->
-                    <a href="{{ file.url }}" onclick="trackFileDownload('{{ file.name }}')">{{ file.name }}</a>
+                    <a href="{{ file.url }}" onclick="trackFileDownload('{{ file.name }}', '{{ file.user }}')">{{ file.name }}</a>
                 </td>
                 <td>{{ file.size }}</td>
                 <td>{{ file.last_modified }}</td>
