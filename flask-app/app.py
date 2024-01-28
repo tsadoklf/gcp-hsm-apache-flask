@@ -56,21 +56,28 @@ def whitelist(ip_whitelist, domain_whitelist):
             client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('HTTP_X_REAL_IP', request.remote_addr))
             host = 'unset'
             
+            # if the IP is not in the whitelist - try by host name
             if client_ip not in ip_whitelist:
                 try:
+                    # resolve hostname
                     host = socket.gethostbyaddr(client_ip)[0]
+                    # the host is not in the whitelist - return forbidden
                     if host not in domain_whitelist:
-                        return jsonify({'error': host + ' -> ' + client_ip + ' -> ' + 'Unauthorized'}), 403  # Return a 403 Forbidden status
+                        return jsonify({'host not authorized': host + ' -> ' + client_ip + ' -> ' + 'Unauthorized'}), 403  # Return a 403 Forbidden status
                 except socket.herror:
-                    return jsonify({'error': host + ' -> ' + client_ip + ' -> ' + 'Unauthorized'}), 403  # Return a 403 Forbidden status
+                    # cannot resolve the host name, and the IP is not in the whitelist - return forbidden
+                    return jsonify({'unidentified host': host + ' -> ' + client_ip + ' -> ' + 'Unauthorized'}), 403  # Return a 403 Forbidden status
 
-            return func(*args, **kwargs)
+            # The IP or the host name are is  in the whitelist - allow access
+            return jsonify({'OK host': host + ' -> ' + client_ip + ' -> ' + ' Authorized !!!'}), 403  # Return a 403 Forbidden status
+            # return func(*args, **kwargs)
+            
         return wrapper
     return decorator
 
 # Define the set of allowed IP addresses
 #                AmirHome                       update.resec.co 
-allowed_ips = {'192.168.96.3', '192.168.112.3' '20.216.132.35'} 
+allowed_ips = {'147.235.218.40', '20.216.132.35'} 
 # I keep getting apache-server.app-network for host and 192.168.128.3, 192.168.112.3, for IP
 # because of the network container abstraction
 
