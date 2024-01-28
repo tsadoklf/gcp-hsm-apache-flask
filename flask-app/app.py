@@ -51,9 +51,13 @@ def whitelist(ip_whitelist, domain_whitelist):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
+            # not working (gets local IPs)
+            # I keep getting apache-server.app-network for host and 192.168.128.3, 192.168.112.3, for IP
             # client_ip = request.remote_addr
             # client_ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+            # works - gets the real user IP
             client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('HTTP_X_REAL_IP', request.remote_addr))
+            # trying to get a domain name, for now didnt managet to get anything from it except an empty value
             client_domain = request.environ.get('REMOTE_HOST', '')
             host = 'unset'
             
@@ -71,19 +75,19 @@ def whitelist(ip_whitelist, domain_whitelist):
                     return jsonify({'unidentified host': host + ' -> ' + client_ip + ' -> ' + client_domain + ' -> ' + 'Unauthorized'}), 403  # Return a 403 Forbidden status
 
             # The IP or the host name are is  in the whitelist - allow access
-            return jsonify({'OK host': host + ' -> ' + client_ip + ' -> ' + client_domain + ' -> ' + 'Authorized !!!'}), 403  # Return a 403 Forbidden status
-            # return func(*args, **kwargs)
+            # for debugging
+            # return jsonify({'OK host': host + ' -> ' + client_ip + ' -> ' + client_domain + ' -> ' + 'Authorized !!!'}), 403  # Return a 403 Forbidden status
+            return func(*args, **kwargs)
             
         return wrapper
     return decorator
 
 # Define the set of allowed IP addresses
-#                AmirHome                       update.resec.co 
+#               Amirs Home      update.resec.co 
 allowed_ips = {'147.235.218.40', '20.216.132.35'} 
-# I keep getting apache-server.app-network for host and 192.168.128.3, 192.168.112.3, for IP
-# because of the network container abstraction
 
 # Define the set of allowed domains
+#                   update.resec.co 
 allowed_domains = {'updates.resec.co'}
 
 # -------------------------------------------
@@ -243,7 +247,8 @@ def logout():
 
 # -------------------------------------------
 @app.route('/sync')
-@whitelist(allowed_ips, allowed_domains)
+# ToDo: white listing should be enabled here...
+# @whitelist(allowed_ips, allowed_domains)
 def trigger_file_downloads():
     app.logger.info('Route /sync accessed')
     
