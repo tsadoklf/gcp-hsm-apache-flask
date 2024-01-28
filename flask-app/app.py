@@ -54,6 +54,7 @@ def whitelist(ip_whitelist, domain_whitelist):
             # client_ip = request.remote_addr
             # client_ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
             client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('HTTP_X_REAL_IP', request.remote_addr))
+            client_domain = request.environ.get('REMOTE_HOST', '')
             host = 'unset'
             
             # if the IP is not in the whitelist - try by host name
@@ -61,7 +62,6 @@ def whitelist(ip_whitelist, domain_whitelist):
                 try:
                     # resolve hostname
                     host = socket.gethostbyaddr(client_ip)[0]
-                    client_domain = request.environ.get('REMOTE_HOST', '')
                     
                     # the host is not in the whitelist - return forbidden
                     if host not in domain_whitelist:
