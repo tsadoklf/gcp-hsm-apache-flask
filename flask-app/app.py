@@ -52,7 +52,8 @@ def whitelist(ip_whitelist, domain_whitelist):
         @wraps(func)
         def wrapper(*args, **kwargs):
             # client_ip = request.remote_addr
-            client_ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+            # client_ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+            client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('HTTP_X_REAL_IP', request.remote_addr))
 
             if client_ip not in ip_whitelist:
                 try:
