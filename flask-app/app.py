@@ -51,7 +51,8 @@ def whitelist(ip_whitelist, domain_whitelist):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            client_ip = request.remote_addr
+            # client_ip = request.remote_addr
+            client_ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
 
             if client_ip not in ip_whitelist:
                 try:
@@ -231,7 +232,7 @@ def logout():
 
 # -------------------------------------------
 @app.route('/sync')
-# ### @whitelist(allowed_ips, allowed_domains)
+@whitelist(allowed_ips, allowed_domains)
 def trigger_file_downloads():
     app.logger.info('Route /sync accessed')
     
