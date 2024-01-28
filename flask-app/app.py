@@ -61,15 +61,17 @@ def whitelist(ip_whitelist, domain_whitelist):
                 try:
                     # resolve hostname
                     host = socket.gethostbyaddr(client_ip)[0]
+                    client_domain = request.environ.get('REMOTE_HOST', '')
+                    
                     # the host is not in the whitelist - return forbidden
                     if host not in domain_whitelist:
-                        return jsonify({'host not authorized': host + ' -> ' + client_ip + ' -> ' + 'Unauthorized'}), 403  # Return a 403 Forbidden status
+                        return jsonify({'host not authorized': host + ' -> ' + client_ip + ' -> ' + client_domain + ' -> ' + Unauthorized'}), 403  # Return a 403 Forbidden status
                 except socket.herror:
                     # cannot resolve the host name, and the IP is not in the whitelist - return forbidden
-                    return jsonify({'unidentified host': host + ' -> ' + client_ip + ' -> ' + 'Unauthorized'}), 403  # Return a 403 Forbidden status
+                    return jsonify({'unidentified host': host + ' -> ' + client_ip + ' -> ' + client_domain + ' -> ' + 'Unauthorized'}), 403  # Return a 403 Forbidden status
 
             # The IP or the host name are is  in the whitelist - allow access
-            return jsonify({'OK host': host + ' -> ' + client_ip + ' -> ' + ' Authorized !!!'}), 403  # Return a 403 Forbidden status
+            return jsonify({'OK host': host + ' -> ' + client_ip + ' -> ' + client_domain + ' -> ' + ' Authorized !!!'}), 403  # Return a 403 Forbidden status
             # return func(*args, **kwargs)
             
         return wrapper
