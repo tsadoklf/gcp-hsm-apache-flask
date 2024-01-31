@@ -39,6 +39,7 @@ users = {
     "user2": "password2",
     "amir" : "1111",
     "yaar" : "1111",
+    "mae"  : "1111",
     "oren" : "1111"
 }
 
