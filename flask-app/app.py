@@ -329,19 +329,20 @@ def sync_files():
     #        return url_page_dump + soup_dump + url_page_dump + 'Failed to retrieve web page.'
 
 # -------------------------------------------
-@app.route('/.well-known/pki-validation')
-def browse_files():
-    app.logger.info('Route /.well-known/pki-validation accessed')
-    # path of your directory
-    directory = './../data/.well-known/pki-validation'
-    file_tree = get_file_tree(directory)
+# @app.route('/.well-known/pki-validation')
+# def browse_files():
+#     app.logger.info('Route /.well-known/pki-validation accessed')
+#     # path of your directory
+#     directory = './../data/.well-known/pki-validation'
+#     file_tree = get_file_tree(directory)
 
-    print(file_tree)
-    return render_template('browse_files.html', files=file_tree, title='Resec AV Updates')
+#     print(file_tree)
+#     return render_template('browse_files.html', files=file_tree, title='Resec AV Updates')
 
 # -------------------------------------------
 # for validation for ssl.com certification
-@app.route('/.well-known/pki-validation/11D5BD656B73039B0C4F18BB9F7D70B9.txt')
+# @app.route('/.well-known/pki-validation/11D5BD656B73039B0C4F18BB9F7D70B9.txt')
+@app.route('/.well-known/pki-validation')
 def serve_file():
     app.logger.info('Route /.well-known/pki-validation/11D5BD656B73039B0C4F18BB9F7D70B9.txt accessed')
     # path of the directory containing the file
