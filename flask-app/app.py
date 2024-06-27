@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 from google.cloud import storage
 from datetime import timedelta
 from dotenv import load_dotenv
@@ -7,6 +7,8 @@ import ssl
 import logging
 from collections import defaultdict
 import datetime
+
+app = Flask(__name__)
 
 # --- Amir
 from flask import Flask, send_file
@@ -329,14 +331,23 @@ def sync_files():
 # -------------------------------------------
 @app.route('/.well-known/pki-validation')
 def browse_files():
-    app.logger.info('Route /browse_files accessed')
+    app.logger.info('Route /.well-known/pki-validation accessed')
     # path of your directory
     directory = './../data/.well-known/pki-validation'
     file_tree = get_file_tree(directory)
 
-    # print("===========================================")
     print(file_tree)
     return render_template('browse_files.html', files=file_tree, title='Resec AV Updates')
+
+# -------------------------------------------
+# for validation for ssl.com certification
+@app.route('/.well-known/pki-validation/11D5BD656B73039B0C4F18BB9F7D70B9.txt')
+def serve_file():
+    app.logger.info('Route /.well-known/pki-validation/11D5BD656B73039B0C4F18BB9F7D70B9.txt accessed')
+    # path of the directory containing the file
+    directory = os.path.abspath('./../data/.well-known/pki-validation')
+    filename = '11D5BD656B73039B0C4F18BB9F7D70B9.txt'
+    return send_from_directory(directory, filename)
 
 # -------------------------------------------
 @app.route('/browse_files')
@@ -346,7 +357,6 @@ def browse_files():
     directory = './../data'
     file_tree = get_file_tree(directory)
 
-    # print("===========================================")
     print(file_tree)
     return render_template('browse_files.html', files=file_tree, title='Resec AV Updates')
 
@@ -374,7 +384,6 @@ def private_area():
     directory = './../data/' + session['username']
     file_tree = get_file_tree(directory)
 
-    # print("===========================================")
     print(file_tree)
     return render_template('browse_files.html', files=file_tree, title='Resec Private Area (' + current_username + ')')
 
@@ -487,10 +496,3 @@ if __name__ == '__main__':
     logger.info('Starting flask-app...')
     
     app.run(host=os.getenv('APP_HOST'),port=os.getenv('APP_PORT'),debug=True)
-
-
-
-
-
-
-
