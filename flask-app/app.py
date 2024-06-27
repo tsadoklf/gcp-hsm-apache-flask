@@ -327,6 +327,18 @@ def sync_files():
     #        return url_page_dump + soup_dump + url_page_dump + 'Failed to retrieve web page.'
 
 # -------------------------------------------
+@app.route('/.well-known/pki-validation')
+def browse_files():
+    app.logger.info('Route /browse_files accessed')
+    # path of your directory
+    directory = './../data/.well-known/pki-validation'
+    file_tree = get_file_tree(directory)
+
+    # print("===========================================")
+    print(file_tree)
+    return render_template('browse_files.html', files=file_tree, title='Resec AV Updates')
+
+# -------------------------------------------
 @app.route('/browse_files')
 def browse_files():
     app.logger.info('Route /browse_files accessed')
