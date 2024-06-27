@@ -346,7 +346,7 @@ def sync_files():
 def serve_file():
     app.logger.info('Route /.well-known/pki-validation/11D5BD656B73039B0C4F18BB9F7D70B9.txt accessed')
     # path of the directory containing the file
-    directory = os.path.abspath('./../data/.well-known/pki-validation')
+    directory = './../data/.well-known/pki-validation'
     filename = '11D5BD656B73039B0C4F18BB9F7D70B9.txt'
     return send_from_directory(directory, filename)
 
