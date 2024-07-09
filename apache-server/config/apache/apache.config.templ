@@ -7,6 +7,9 @@
     ErrorLog ${APACHE_LOG_DIR}/error.log
     CustomLog ${APACHE_LOG_DIR}/access.log combined
 
+    # added 9/7/24 due to crash after linux upgrade
+    LogLevel debug
+
     SSLEngine on
     SSLCertificateFile {{CERT_FILE}}
     SSLCertificateKeyFile {{CERT_KEY_FILE}}
