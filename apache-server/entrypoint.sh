@@ -72,9 +72,8 @@ function update_config(){
 }
 
 function update_apache_global_config(){
-    # commented as it seems to be already defined in the config
-    #  update_config "$APACHE_GLOBAL_CONFIG" "ServerName" "$SERVER_NAME"
-    update_config "$APACHE_GLOBAL_CONFIG" "LogLevel" "debug"
+    echo "# update_config $APACHE_GLOBAL_CONFIG ServerName $SERVER_NAME - skipped !!!"
+    # update_config "$APACHE_GLOBAL_CONFIG" "ServerName" "$SERVER_NAME"
 }
 
 function update_apache_envvars(){
