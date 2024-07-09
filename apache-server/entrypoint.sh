@@ -72,7 +72,8 @@ function update_config(){
 }
 
 function update_apache_global_config(){
-    update_config "$APACHE_GLOBAL_CONFIG" "ServerName" "$SERVER_NAME"
+    # commented as it seems to be already defined in the config
+    #  update_config "$APACHE_GLOBAL_CONFIG" "ServerName" "$SERVER_NAME"
 }
 
 function update_apache_envvars(){
