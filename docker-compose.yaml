@@ -1,4 +1,5 @@
-version: '3.8'
+# docker claims this declaration is obsolete
+# version: '3.8'
 
 networks:
   app-network:
