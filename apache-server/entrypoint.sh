@@ -62,18 +62,27 @@ function update_config(){
     local var_value="$3"
 
     # Check if the variable definition exists in the file
+#     if grep -q "$var_name" "$config_file"; then
+        # Variable exists; update its value using sed
+#         sed -i "s#$var_name .*#$var_name=\"$var_value\"#" "$config_file"
+#     else
+        # Variable does not exist; add it to the end of the file using tee
+#         echo "$var_name \"$var_value\"" | tee -a "$config_file" >/dev/null
+#     fi
+
+    # Check if the variable definition exists in the file
     if grep -q "$var_name" "$config_file"; then
         # Variable exists; update its value using sed
-        sed -i "s#$var_name .*#$var_name=\"$var_value\"#" "$config_file"
+        sed -i "s#$var_name .*#$var_name \"$var_value\"#" "$config_file"
     else
         # Variable does not exist; add it to the end of the file using tee
         echo "$var_name \"$var_value\"" | tee -a "$config_file" >/dev/null
     fi
+    
 }
 
 function update_apache_global_config(){
-    echo "# update_config $APACHE_GLOBAL_CONFIG ServerName $SERVER_NAME - skipped !!!"
-    # update_config "$APACHE_GLOBAL_CONFIG" "ServerName" "$SERVER_NAME"
+    update_config "$APACHE_GLOBAL_CONFIG" "ServerName" "$SERVER_NAME"
 }
 
 function update_apache_envvars(){
