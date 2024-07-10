@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
     python3-certbot-apache
 
 # added  apt-get upgrade -y as after Debian upgrade the container fails to load with malloc issue
-RUN apt-get upgrade -y
+# RUN apt-get upgrade -y
 
 RUN pip install mod_wsgi
 
