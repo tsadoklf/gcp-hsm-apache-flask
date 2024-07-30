@@ -38,6 +38,7 @@ ENV LIBKMSP_DIR="/usr/lib/x86_64-linux-gnu/engines-1.2/kms11/libkmsp11-1.6-linux
 #     mv libkmsp11-1.3-linux-amd64/libkmsp11.so $LIBKMSP_DIR && \
 #     rm -rf libkmsp11-1.3-linux-amd64.tar.gz libkmsp11-1.3-linux-amd64
 
+## get and setup the PKCS library for Apache...
 RUN wget https://github.com/GoogleCloudPlatform/kms-integrations/releases/download/pkcs11-v1.6/libkmsp11-1.6-linux-amd64.tar.gz && \
     tar -xzvf libkmsp11-1.6-linux-amd64.tar.gz && \
     mkdir -p $LIBKMSP_DIR && \
