@@ -131,6 +131,7 @@ function create_certificate_signing_request(){
     echo ""
     openssl req -new -subj "$SUBJECT" -sha256 -engine pkcs11 -keyform engine -key pkcs11:object="$KEY_NAME" > "$CERTIFICATE_SIGNING_REQUEST_FILE" 
 }
+
 # https://hsm.resec.co/
 function request_letsencrypt_certificate(){
 
@@ -190,6 +191,10 @@ function verify_certificate_signing_request(){
     #     --output-file "$hsm_public_key_file"
 
     # openssl pkey -in "$hsm_public_key_file" -pubin -text
+
+    echo ""
+    echo "xxxxxxxxxxxxxxxxx Verifying CSR ..."
+    echo ""    
 
     openssl req -in "$CERTIFICATE_SIGNING_REQUEST_FILE" -noout -pubkey -out "$csr_public_key_file"
     openssl pkey -in "$csr_public_key_file" -pubin -text
@@ -254,7 +259,7 @@ function create_apache_config(){
 
 function enable_apache_modules_and_config(){
     echo ""
-    echo "Enabling the SSL module and the virtual host configuration"
+    echo "xxxxxxxxxxxxxxxxx Enabling the SSL module and the virtual host configuration"
     # sudo a2enmod ssl
     a2enmod ssl
 
@@ -264,9 +269,10 @@ function enable_apache_modules_and_config(){
     a2enmod proxy_http
 
     echo ""
-    echo "a2ensite $APACHE_CONFIG"
+    echo "xxxxxxxxxxxxxxxxxx a2ensite $APACHE_CONFIG"
     a2ensite "$APACHE_CONFIG"
 }
+
 function start_apache(){
     # echo "Restarting Apache ..."
     # systemctl restart apache2
@@ -279,10 +285,12 @@ function start_apache(){
 
     # echo "Apache configuration has been updated."
 }
+
 function stop_apache(){
     echo "Stopping Apache  ..."
     apachectl stop
 }
+
 function verify_apache(){
     # ls -la "$APACHE_SSL_DIR"
 
@@ -346,11 +354,17 @@ function create_certificate(){
     esac
 }
 
+echo "111111 xxxxxxxxxxxxxxxx  validate_env_vars..."
 validate_env_vars
+echo "222222 xxxxxxxxxxxxxxxx  validate_env_vars..."
 update_apache_global_config
+echo "333333 xxxxxxxxxxxxxxxx  validate_env_vars..."
 update_apache_envvars
+echo "444444 xxxxxxxxxxxxxxxx  validate_env_vars..."
 create_apache_config
+echo "555555 xxxxxxxxxxxxxxxx  validate_env_vars..."
 enable_apache_modules_and_config
+echo "666666 xxxxxxxxxxxxxxxx  validate_env_vars..."
 
 # Check if the certificate (/etc/apache2/ssl/certificate.crt) exists
 # If it does not exist, create a self-signed certificate
@@ -371,7 +385,7 @@ fi
 
 if [[ ! -z "$CERTIFICATE_SIGNING_REQUEST_FILE" && -f "$CERTIFICATE_SIGNING_REQUEST_FILE" ]]; then
     echo ""
-    echo "Verifying certificate signing request ..."
+    echo "xxxxxxxxxxxxxxxx Verifying CSR ..."
     verify_certificate_signing_request
 fi
 
