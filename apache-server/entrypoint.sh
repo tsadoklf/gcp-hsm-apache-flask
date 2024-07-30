@@ -103,12 +103,12 @@ function update_apache_envvars(){
     update_env_var "$ENV_VARS_FILE" GRPC_ENABLE_FORK_SUPPORT "1"
     update_env_var "$ENV_VARS_FILE" GOOGLE_APPLICATION_CREDENTIALS "$GOOGLE_APPLICATION_CREDENTIALS"
 
-    echo ""
+    echo "1111-------------------------------------------------"
     echo "$ENV_VARS_FILE file"
     echo "-------------------------------------------------"
     cat $ENV_VARS_FILE
 
-    # echo ""
+    # echo "2222-------------------------------------------------"
     # echo "Updating /etc/profile ..."
     # echo "-------------------------------------------------"
     # # echo "source $ENV_VARS_FILE" | tee -a /etc/profile >/dev/null
@@ -397,8 +397,9 @@ case "$CERTIFICATE_AUTHORITY" in
         exec apachectl -D FOREGROUND -D USE_CHAIN_FILE
         ;;
     "comodo-production" )
-        echo -e "\nStarting Apache in the foreground with a certificate from Comodo."
-        exec apachectl -D FOREGROUND -D USE_CHAIN_FILE
+        echo -e "\n Launching: Starting Apache in the foreground with a certificate from Comodo."
+        exec apachectl -D FOREGROUND
+        # exec apachectl -D FOREGROUND -D USE_CHAIN_FILE
         ;;
     "self-signed")
         echo -e "\nStarting Apache in the foreground with a self-signed certificate."
