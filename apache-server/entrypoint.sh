@@ -89,8 +89,12 @@ function update_apache_envvars(){
     local ENV_VARS_FILE="/etc/apache2/envvars"
 
     # local PKCS11_MODULE_PATH="/usr/lib/x86_64-linux-gnu/engines-1.1/kms11/libkmsp11-1.2-linux-amd64/libkmsp11.so"
-    local PKCS11_MODULE_PATH="/usr/lib/x86_64-linux-gnu/engines-1.1/kms11/libkmsp11-1.3-linux-amd64/libkmsp11.so"
-    local KMS_PKCS11_CONFIG="/usr/lib/x86_64-linux-gnu/engines-1.1/pkcs11-config.yaml"
+    
+    # local PKCS11_MODULE_PATH="/usr/lib/x86_64-linux-gnu/engines-1.1/kms11/libkmsp11-1.3-linux-amd64/libkmsp11.so"
+    # local KMS_PKCS11_CONFIG="/usr/lib/x86_64-linux-gnu/engines-1.1/pkcs11-config.yaml"
+    local PKCS11_MODULE_PATH="/usr/lib/x86_64-linux-gnu/engines-1.2/kms11/libkmsp11-1.6-linux-amd64/libkmsp11.so"
+    local KMS_PKCS11_CONFIG="/usr/lib/x86_64-linux-gnu/engines-1.2/pkcs11-config.yaml"
+    
     local GRPC_ENABLE_FORK_SUPPORT=1
     local GOOGLE_APPLICATION_CREDENTIALS="/app/secrets/kms-sa-private-key.json"
 
