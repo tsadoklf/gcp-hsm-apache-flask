@@ -79,8 +79,7 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 ## -----------------------------------------------------
 RUN apt-get install -y apache2 valgrind
 # ENTRYPOINT ["valgrind", "--tool=memcheck", "--leak-check=full", "/usr/local/bin/entrypoint.sh"]
-ENTRYPOINT ["sh", "-c", "valgrind --tool=memcheck --leak-check=full --log-file=/var/log/valgrind.log entrypoint.sh"]
-
+ENTRYPOINT ["sh", "-c", "valgrind --tool=memcheck --leak-check=full --log-file=/.log/apache2/valgrind.log entrypoint.sh"]
 ## -----------------------------------------------------
 
 
