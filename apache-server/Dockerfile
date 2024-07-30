@@ -73,7 +73,14 @@ ENV GOOGLE_APPLICATION_CREDENTIALS="/app/secrets/kms-sa-private-key.json"
 
 COPY entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
-ENTRYPOINT ["entrypoint.sh"]
+
+# ENTRYPOINT ["entrypoint.sh"]
+## trying to debug the entry point
+## -----------------------------------------------------
+ENTRYPOINT ["valgrind", "--tool=memcheck", "--leak-check=full", "/usr/local/bin/entrypoint.sh"]
+## -----------------------------------------------------
+
+
 
 # Start Apache in the foreground
 # CMD ["apache2ctl", "-D", "FOREGROUND", "-D", "USE_CHAIN_FILE"]
