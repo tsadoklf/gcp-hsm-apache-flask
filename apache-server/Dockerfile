@@ -74,10 +74,8 @@ ENV GOOGLE_APPLICATION_CREDENTIALS="/app/secrets/kms-sa-private-key.json"
 COPY entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
+ENTRYPOINT ["entrypoint.sh"]
 
-
-CMD ["apache2ctl", "-D", "FOREGROUND", "-D", "USE_CHAIN_FILE"]
-# ENTRYPOINT ["entrypoint.sh"]
 ## trying to debug the entry point
 ## -----------------------------------------------------
 # RUN apt-get install -y apache2 valgrind
