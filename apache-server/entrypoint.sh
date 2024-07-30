@@ -398,8 +398,7 @@ case "$CERTIFICATE_AUTHORITY" in
         ;;
     "comodo-production" )
         echo -e "\n Launching: Starting Apache in the foreground with a certificate from Comodo."
-        exec apachectl -D FOREGROUND
-        # exec apachectl -D FOREGROUND -D USE_CHAIN_FILE
+        exec apachectl -D FOREGROUND -D USE_CHAIN_FILE
         ;;
     "self-signed")
         echo -e "\nStarting Apache in the foreground with a self-signed certificate."
