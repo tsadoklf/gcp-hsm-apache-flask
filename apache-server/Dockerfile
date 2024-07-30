@@ -77,9 +77,9 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 # ENTRYPOINT ["entrypoint.sh"]
 ## trying to debug the entry point
 ## -----------------------------------------------------
-RUN apt-get install -y apache2 valgrind
+# RUN apt-get install -y apache2 valgrind
+ ENTRYPOINT ["sh", "-c", "valgrind --tool=memcheck --leak-check=full --log-file=${PWD}/.log/apache2/valgrind.log entrypoint.sh"]
 # ENTRYPOINT ["valgrind", "--tool=memcheck", "--leak-check=full", "/usr/local/bin/entrypoint.sh"]
-ENTRYPOINT ["sh", "-c", "valgrind --tool=memcheck --leak-check=full --log-file=/.log/apache2/valgrind.log entrypoint.sh"]
 ## -----------------------------------------------------
 
 
