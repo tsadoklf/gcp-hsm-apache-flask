@@ -103,12 +103,13 @@ function update_apache_envvars(){
     update_env_var "$ENV_VARS_FILE" GRPC_ENABLE_FORK_SUPPORT "1"
     update_env_var "$ENV_VARS_FILE" GOOGLE_APPLICATION_CREDENTIALS "$GOOGLE_APPLICATION_CREDENTIALS"
 
-    echo "1111-------------------------------------------------"
+    echo "------------------- Env Vars ------------------------------"
     echo "$ENV_VARS_FILE file"
-    echo "-------------------------------------------------"
+    echo "====================="
     cat $ENV_VARS_FILE
+    echo "--------------------Env Vars End-----------------------------"
 
-    # echo "2222-------------------------------------------------"
+    # echo "-------------------------------------------------"
     # echo "Updating /etc/profile ..."
     # echo "-------------------------------------------------"
     # # echo "source $ENV_VARS_FILE" | tee -a /etc/profile >/dev/null
@@ -193,7 +194,7 @@ function verify_certificate_signing_request(){
     # openssl pkey -in "$hsm_public_key_file" -pubin -text
 
     echo ""
-    echo "xxxxxxxxxxxxxxxxx Verifying CSR ..."
+    echo "---------------- Verifying CSR ... -------------"
     echo ""    
 
     openssl req -in "$CERTIFICATE_SIGNING_REQUEST_FILE" -noout -pubkey -out "$csr_public_key_file"
@@ -236,7 +237,7 @@ function copy_self_signed_certificate(){
 
 function create_apache_config(){
     echo ""
-    echo "Updating Apache config ..."
+    echo "--------------- Updating Apache config ... --------------"
 
     local FLASK_APP="http://flask-app:5000/"
 
@@ -249,8 +250,9 @@ function create_apache_config(){
          "$APACHE_CONFIG_TEMPLATE" > "$APACHE_CONFIG"
 
     echo ""
-    echo "Apache config '$APACHE_CONFIG' "
+    echo "------------------Apache config '$APACHE_CONFIG' --------------"
     cat "$APACHE_CONFIG"
+    echo "--------------- Updating Apache config END --------------"
 
     # Copy the generated configuration to Apache's configuration directory
     cp "$APACHE_CONFIG" "/etc/apache2/sites-available/$APACHE_CONFIG"
@@ -259,18 +261,19 @@ function create_apache_config(){
 
 function enable_apache_modules_and_config(){
     echo ""
-    echo "xxxxxxxxxxxxxxxxx Enabling the SSL module and the virtual host configuration"
+    echo "-------------------- Enabling the SSL module and the virtual host configuration ----------------"
     # sudo a2enmod ssl
     a2enmod ssl
 
     echo ""
-    echo "Enabling the 'mod_proxy' module in Apache ..."
+    echo "--------------- Enabling the 'mod_proxy' module in Apache ...-----------"
     a2enmod proxy
     a2enmod proxy_http
 
     echo ""
-    echo "xxxxxxxxxxxxxxxxxx a2ensite $APACHE_CONFIG"
+    echo "------------------ a2ensite $APACHE_CONFIG ---------------"
     a2ensite "$APACHE_CONFIG"
+    echo "-------------------- Enabling SSL END -------------------"
 }
 
 function start_apache(){
@@ -295,7 +298,7 @@ function verify_apache(){
     # ls -la "$APACHE_SSL_DIR"
 
     echo ""
-    echo "Checking Apache configuration ..."
+    echo "------------ Checking Apache configuration ... ---------------"
     echo ""
     # sudo systemctl status apache2
     apachectl configtest
@@ -304,21 +307,21 @@ function verify_apache(){
 function validate_env_vars(){
     if [[ -z "$SERVER_NAME" ]]; then
         echo ""
-        echo "ERROR: SERVER_NAME is empty."
+        echo "!!!!!!!!!!!!!!!!!! ERROR: SERVER_NAME is empty."
         echo ""
         exit 1
     fi
 
     if [[ -z "$CERTIFICATE_AUTHORITY" ]]; then
         echo ""
-        echo "ERROR: CERTIFICATE_AUTHORITY is empty."
+        echo "!!!!!!!!!!!!!!!!!! ERROR: CERTIFICATE_AUTHORITY is empty."
         echo ""
         exit 1
     fi
 
     if [[ "$CERTIFICATE_AUTHORITY" != "self-signed" && "$CERTIFICATE_AUTHORITY" != "letsencrypt-staging" && "$CERTIFICATE_AUTHORITY" != "letsencrypt-production" && "$CERTIFICATE_AUTHORITY" != "comodo-production" ]]; then
         echo ""
-        echo "ERROR: CERTIFICATE_AUTHORITY must be one of the following: 'self-signed', 'letsencrypt-staging', 'letsencrypt-production' or 'comodo-production'."
+        echo "!!!!!!!!!!!!!!!!!! ERROR: CERTIFICATE_AUTHORITY must be one of the following: 'self-signed', 'letsencrypt-staging', 'letsencrypt-production' or 'comodo-production'."
         echo ""
         exit 1
 
@@ -326,7 +329,7 @@ function validate_env_vars(){
 
     if [[ "$SERVER_NAME" == "localhost" && "$CERTIFICATE_AUTHORITY" != "self-signed" ]]; then
         echo ""
-        echo "ERROR: SERVER_NAME cannot be 'localhost' when using a certificate authority other than 'self-signed'."
+        echo "!!!!!!!!!!!!!!!!!! ERROR: SERVER_NAME cannot be 'localhost' when using a certificate authority other than 'self-signed'."
         echo ""
         exit 1
     fi
@@ -354,17 +357,17 @@ function create_certificate(){
     esac
 }
 
-echo "111111 xxxxxxxxxxxxxxxx  validate_env_vars..."
+echo "111111 ----------------  validate_env_vars..."
 validate_env_vars
-echo "222222 xxxxxxxxxxxxxxxx  validate_env_vars..."
+echo "222222 ----------------  validate_env_vars..."
 update_apache_global_config
-echo "333333 xxxxxxxxxxxxxxxx  validate_env_vars..."
+echo "333333 ----------------  validate_env_vars..."
 update_apache_envvars
-echo "444444 xxxxxxxxxxxxxxxx  validate_env_vars..."
+echo "444444 ----------------  validate_env_vars..."
 create_apache_config
-echo "555555 xxxxxxxxxxxxxxxx  validate_env_vars..."
+echo "555555 ----------------  validate_env_vars..."
 enable_apache_modules_and_config
-echo "666666 xxxxxxxxxxxxxxxx  validate_env_vars..."
+echo "666666 ----------------  validate_env_vars..."
 
 # Check if the certificate (/etc/apache2/ssl/certificate.crt) exists
 # If it does not exist, create a self-signed certificate
@@ -385,7 +388,7 @@ fi
 
 if [[ ! -z "$CERTIFICATE_SIGNING_REQUEST_FILE" && -f "$CERTIFICATE_SIGNING_REQUEST_FILE" ]]; then
     echo ""
-    echo "xxxxxxxxxxxxxxxx Verifying CSR ..."
+    echo "---------------- Verifying CSR ... ----------------"
     verify_certificate_signing_request
 fi
 
