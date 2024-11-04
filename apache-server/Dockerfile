@@ -2,7 +2,7 @@ FROM python:3.8
 USER root
 
 RUN apt-get update && apt-get install -y \
-    apache2=2.4.52-1ubuntu1.20.04.10 \
+    apache2=2.4.29-1ubuntu4.14 \
     apache2-dev \
     ssl-cert \
     libengine-pkcs11-openssl \
