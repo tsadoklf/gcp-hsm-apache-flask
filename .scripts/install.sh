@@ -1,17 +1,22 @@
 #!/bin/bash
 set -e
 
-BRANCH="main"
+APP_GIT_REPOSITORY="https://github.com/tsadoklf/gcp-hsm-apache-flask.git"
+APP_GIT_BRANCH="main"
+
 APP_DIR="gcp-hsm-apache-flask"
 
-# backup the current folder
-cp -r ${APP_DIR} ${APP_DIR}-$(date +%s)/
+if [ -d "${APP_DIR}" ]; then
+    APP_BACKUP_DIR="gcp-hsm-apache-flask-backup-$(date +%Y%m%d%H%M%S)"
+    echo "Backing up the current version of the app to ${APP_BACKUP_DIR}..."
+    cp -r ${APP_DIR} ${APP_BACKUP_DIR} 
 
-# remove the current folder
-rm -r ${APP_DIR} || true
+    echo "Removing the current version of the app..."
+    rm -r ${APP_DIR} || true
+fi
 
 # get the latest version of the app
-git clone https://github.com/tsadoklf/gcp-hsm-apache-flask.git@${BRANCH} ${APP_DIR}
+git clone --branch ${APP_GIT_BRANCH} ${APP_GIT_REPOSITORY} ${APP_DIR}
 
 # populate the certificate folder ???????
 # cp -r ssl-certificates-lets-encrypt-prod/ gcp-hsm-apache-flask/.ssl
