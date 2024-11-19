@@ -1,6 +1,6 @@
 #!/bin/bash
 
-APP_DATA_DIR="gcp-hsm-apache-flask/data"
+LOCAL_DATA_DIR="./data"
 
 # download the index page
 rm index.html
@@ -20,5 +20,5 @@ echo "$file_list"
 for file in $file_list
 do
     # wget "https://update.resec.co/$file" -P /var/www/html/updates/buffer
-    wget "https://update.resec.co/$file" -P ${APP_DATA_DIR}
+    wget "https://update.resec.co/$file" -P ${LOCAL_DATA_DIR}
 done

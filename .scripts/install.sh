@@ -33,15 +33,18 @@ cp ${CERTIFICATES_SRC_DIR}/ca-bundle-client.crt  ${CERTIFICATES_DST_DIR}/certifi
 
 mkdir -p ${APP_DATA_DIR}
 
-if [[ "$1" == "skip" ]]; then
-   echo "Skipping getting the latest data from Resec. Copying the data from the local data folder..."
-   cp -r data/* ${APP_DATA_DIR}/
-else
+if [[ "$1" == "update" ]]; then
     echo "Getting the latest data from Resec..."
     chmod +x get-latest-data.sh && ./get-latest-data.sh
 fi
 
+echo "Copying the data from the local data folder..."
+cp -r data/* ${APP_DATA_DIR}/
+
 # inside the app folder run the launch bash
 cd gcp-hsm-apache-flask && ./exec.sh down && ./exec.sh up-bg
 
-# exit
+APP_URL="https://hsm.resec.co/"
+echo ""
+echo "🚀 The application is up and running in the background! Access it at ${APP_URL} 🎉"
+
