@@ -27,9 +27,10 @@ services:
   apache-server:
     container_name: apache-server
     platform: linux/amd64
-    build:
-      context: ./apache-server
-      dockerfile: Dockerfile
+    image: gcp-hsm-apache-flask-apache-server:last-stable
+    # build:
+    #   context: ./apache-server
+    #   dockerfile: Dockerfile
     # hostname: localhost
     ports:
       - "80:80"
