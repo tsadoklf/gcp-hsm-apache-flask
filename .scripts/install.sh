@@ -5,6 +5,7 @@ APP_GIT_REPOSITORY="https://github.com/tsadoklf/gcp-hsm-apache-flask.git"
 APP_GIT_BRANCH="main"
 
 APP_DIR="gcp-hsm-apache-flask"
+APP_DATA_DIR="${APP_DIR}/data"
 
 if [ -d "${APP_DIR}" ]; then
     APP_BACKUP_DIR="gcp-hsm-apache-flask-backup-$(date +%Y%m%d%H%M%S)"
@@ -30,22 +31,17 @@ CERTIFICATES_DST_DIR="${APP_DIR}/.ssl"
 cp ${CERTIFICATES_SRC_DIR}/hsm_resec_co.crt      ${CERTIFICATES_DST_DIR}/certificate.crt
 cp ${CERTIFICATES_SRC_DIR}/ca-bundle-client.crt  ${CERTIFICATES_DST_DIR}/certificates-chain.crt
 
-# Prepare the output folder
-mkdir -p gcp-hsm-apache-flask/data 
-# cp -r data/* gcp-hsm-apache-flask/data
+mkdir -p ${APP_DATA_DIR}
 
-# inside the app folder run the launch bash
-cd gcp-hsm-apache-flask
-
-# run the docker-compose down and up (in background)
-./exec.sh down && ./exec.sh up-bg
-
-# populate the update files folder from the remote server
 if [[ "$1" == "skip" ]]; then
-   echo "skipping file copy from Resec"
+   echo "Skipping getting the latest data from Resec. Copying the data from the local data folder..."
+   cp -r data/* ${APP_DATA_DIR}/
 else
-   cd ..
-   ./getupdatelist.sh
+    echo "Getting the latest data from Resec..."
+    chmod +x get-latest-data.sh && ./get-latest-data.sh
 fi
 
-exit
+# inside the app folder run the launch bash
+cd gcp-hsm-apache-flask && ./exec.sh down && ./exec.sh up-bg
+
+# exit
