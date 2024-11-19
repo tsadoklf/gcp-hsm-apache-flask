@@ -27,7 +27,10 @@ services:
   apache-server:
     container_name: apache-server
     platform: linux/amd64
-    image: gcp-hsm-apache-flask-apache-server:last-stable
+    
+    # image: gcp-hsm-apache-flask-apache-server:last-stable
+    image: us-central1-docker.pkg.dev/resec-cloud/apache-hsm/last-stable
+
     # build:
     #   context: ./apache-server
     #   dockerfile: Dockerfile
